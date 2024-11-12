@@ -3,13 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  --background: radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%);
   --foreground: #171717;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: radial-gradient(circle at top, #1a1a1a 0%, #1a1810 50%, #1a1613 100%);
     --foreground: #ededed;
   }
 }
@@ -17,5 +17,11 @@
 body {
   color: var(--foreground);
   background: var(--background);
+  min-height: 100vh;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.gradient-background {
+  background: var(--background);
+  background-attachment: fixed;
 }
