@@ -57,7 +57,7 @@ export async function GET(request: Request) {
           }
         },
         settings: {
-          subject_line: `Bitcoin Daily: BTC at $${bitcoinPrice.toLocaleString()}`,
+          subject_line: `Bitcoin Daily: BTC at $${bitcoinPrice.price.toLocaleString()}`,
           preview_text: 'Your daily dose of Bitcoin news',
           title: `Bitcoin Newsletter - ${new Date().toLocaleDateString()}`,
           from_name: 'Bitcoin Brainiac',
