@@ -90,14 +90,24 @@ export async function GET(request: Request) {
             </head>
             <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
               <div style="border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 20px;">
-                <h1 style="color: #1a1a1a; font-size: 24px; margin: 0;">Bitcoin Market Intelligence</h1>
-                <p style="color: #666; font-size: 14px; margin: 5px 0 0;">Daily Market Report - ${new Date().toLocaleDateString()}</p>
+                <h1 style="color: #1a1a1a; font-size: 24px; margin: 0;">Bitcoin Daily Update</h1>
+                <p style="color: #666; font-size: 14px; margin: 5px 0 0;">${new Date().toLocaleDateString('en-US', { 
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}</p>
               </div>
-              ${newsletterContent.split('\n\n').map(paragraph => 
-                `<p style="margin: 0 0 15px;">${paragraph}</p>`
-              ).join('')}
+              ${newsletterContent
+                .split('\n\n')
+                .map(paragraph => {
+                  // Convert **text** to bold HTML
+                  const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1a1a1a; font-size: 18px; display: block; margin-top: 20px;">$1</strong>');
+                  return `<p style="margin: 0 0 15px;">${boldText}</p>`;
+                })
+                .join('')}
               <div style="border-top: 2px solid #eee; margin-top: 20px; padding-top: 20px; font-size: 12px; color: #666;">
-                <p>This report is provided for informational purposes only.</p>
+                <p>Have thoughts about Bitcoin? Just hit reply!</p>
               </div>
             </body>
           </html>

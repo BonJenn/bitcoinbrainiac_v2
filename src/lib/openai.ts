@@ -6,21 +6,20 @@ const openai = new OpenAI({
 
 export async function generateNewsletter(articles: any[], bitcoinPrice: number) {
   const prompt = `
-    Create a professional Bitcoin market newsletter that avoids spam trigger words.
+    Create a friendly, conversational Bitcoin newsletter.
     Guidelines:
-    - Use professional, measured language
-    - Avoid excessive punctuation or all caps
-    - Don't use hype words like "amazing", "incredible", "opportunity"
-    - Focus on factual reporting and analysis
-    - Use proper grammar and formatting
+    - Write like you're explaining to a friend
+    - Keep it super brief and engaging
+    - Use clear, simple language
+    - Make it scannable with bold headings
     
     Structure:
-    1. Market Update: Current Bitcoin price ($${bitcoinPrice}) and brief technical analysis
-    2. News Summary: Key developments from the articles (focus on facts, avoid sensationalism)
-    3. Industry Insights: Brief analysis of implications
+    1. **Today's Bitcoin Price** (Quick price update and simple observation)
+    2. **What's New** (2-3 key stories in plain language)
+    3. **Bottom Line** (One friendly takeaway)
     
-    Tone: Professional, analytical, and informative. Similar to a financial market report.
-    Length: 400-500 words.
+    Tone: Knowledgeable friend sharing updates
+    Length: 150-200 words maximum
   `;
 
   const completion = await openai.chat.completions.create({
@@ -28,7 +27,7 @@ export async function generateNewsletter(articles: any[], bitcoinPrice: number) 
     messages: [
       {
         role: "system",
-        content: "You are a professional financial newsletter writer for a respected Bitcoin market intelligence service. Maintain a formal, analytical tone."
+        content: "You are a friendly Bitcoin expert writing for a community of interested readers. Make complex topics accessible while maintaining credibility."
       },
       {
         role: "user",
