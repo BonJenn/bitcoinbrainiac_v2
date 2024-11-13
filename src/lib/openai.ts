@@ -9,23 +9,25 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
   const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
   
   const prompt = `
-    Create a concise, factual Bitcoin market update.
+    Create a conversational yet professional Bitcoin market update.
     Guidelines:
-    - Use precise, data-driven language
-    - Focus on price action and key market movements
+    - Use a mix of data and narrative storytelling
     - Include specific numbers and percentages
-    - Maintain neutral, journalistic tone
-    - No emojis or casual language
+    - Reference relevant political/regulatory context
+    - Use em dashes for asides and side notes
+    - Include forward-looking predictions or expert opinions
+    - Feel free to use bullet points for key developments
     - Use this exact price format for the first mention: ${formattedPrice}
-    - For subsequent price mentions, use normal formatting
     
     Structure:
-    1. **Market Update** (Current price, recent movement, key levels)
-    2. **Key Developments** (2-3 most significant news items)
-    3. **Market Context** (Brief technical or fundamental insight)
+    1. Opening hook with current price and major narrative
+    2. Key developments (bullet points welcome)
+    3. Political/regulatory context if relevant
+    4. Expert opinions or market predictions
+    5. Forward-looking conclusion
     
-    Tone: Professional market reporting, similar to Bloomberg or Reuters
-    Length: 150-200 words maximum
+    Tone: Similar to Morning Brew or Axios - smart but conversational
+    Length: 200-250 words
   `;
 
   const completion = await openai.chat.completions.create({
