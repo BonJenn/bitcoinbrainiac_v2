@@ -61,7 +61,7 @@ export async function GET(request: Request) {
           preview_text: 'Your daily dose of Bitcoin news',
           title: `Bitcoin Newsletter - ${new Date().toLocaleDateString()}`,
           from_name: 'Bitcoin Brainiac',
-          reply_to: 'verified@yourdomain.com', // Replace with your verified sender email
+          reply_to: process.env.MAILCHIMP_REPLY_TO, // Use environment variable instead of hardcoded email
         },
       }),
     });
