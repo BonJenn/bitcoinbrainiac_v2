@@ -6,19 +6,36 @@ export const runtime = 'edge';
 
 export async function GET(request: Request) {
   try {
-    const scrapeRes = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/scrape`);
+    console.log('Starting newsletter generation...');
+    
+    // Log the scraping URL we're trying to hit
+    const scrapeUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/scrape`;
+    console.log('Fetching articles from:', scrapeUrl);
+    
+    const scrapeRes = await fetch(scrapeUrl);
+    
     if (!scrapeRes.ok) {
-      throw new Error('Failed to fetch articles');
+      const errorData = await scrapeRes.json();
+      throw new Error(`Failed to fetch articles: ${JSON.stringify(errorData)}`);
     }
     
-    const { articles } = await scrapeRes.json();
+    const data = await scrapeRes.json();
+    
+    if (!data.articles || !Array.isArray(data.articles)) {
+      throw new Error(`Invalid articles data: ${JSON.stringify(data)}`);
+    }
+    
+    console.log('Successfully fetched articles:', data.articles);
+    
     const bitcoinPrice = await getBitcoinPrice();
     
     if (!bitcoinPrice) {
       throw new Error('Failed to fetch Bitcoin price');
     }
 
-    const newsletterContent = await generateNewsletter(articles, bitcoinPrice);
+    console.log('Bitcoin price:', bitcoinPrice);
+
+    const newsletterContent = await generateNewsletter(data.articles, bitcoinPrice);
     
     if (!newsletterContent) {
       throw new Error('Failed to generate newsletter content');
@@ -46,10 +63,15 @@ export async function GET(request: Request) {
       }),
     });
 
+    if (!campaign.ok) {
+      const campaignError = await campaign.json();
+      throw new Error(`Failed to create campaign: ${JSON.stringify(campaignError)}`);
+    }
+
     const campaignData = await campaign.json();
 
     // Set campaign content
-    await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaignData.id}/content`, {
+    const contentResponse = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaignData.id}/content`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
@@ -67,9 +89,48 @@ export async function GET(request: Request) {
       }),
     });
 
+    if (!contentResponse.ok) {
+      const contentError = await contentResponse.json();
+      throw new Error(`Failed to set campaign content: ${JSON.stringify(contentError)}`);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Newsletter error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Newsletter error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    return NextResponse.json({ 
+      error: error.message,
+      details: error.stack 
+    }, { status: 500 });
+  }
+}
+
+async function logError(error: any, context: string) {
+  const errorLog = {
+    timestamp: new Date().toISOString(),
+    context,
+    error: {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    },
+    environment: process.env.NODE_ENV,
+    service: 'newsletter-service'
+  };
+
+  console.error('Newsletter Error:', errorLog);
+
+  // You could also send this to a logging service
+  try {
+    await fetch(`${process.env.ERROR_LOGGING_URL}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(errorLog)
+    });
+  } catch (logError) {
+    console.error('Failed to log error:', logError);
   }
 }
