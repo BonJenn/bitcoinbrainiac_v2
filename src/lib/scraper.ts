@@ -8,7 +8,7 @@ function isBitcoinRelated(text: string): boolean {
 
 export async function scrapeBitcoinNews() {
   const browser = await puppeteer.launch({
-    headless: "new",
+    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox']
   });
   
