@@ -8,7 +8,7 @@ export async function scrapeBitcoinNews() {
     args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
     defaultViewport: chrome.defaultViewport,
     executablePath: await chrome.executablePath(),
-    headless: "new",
+    headless: true,
     ignoreHTTPSErrors: true
   });
   
