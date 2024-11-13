@@ -19,6 +19,10 @@ export async function GET(request: Request) {
     }
 
     const newsletterContent = await generateNewsletter(articles, bitcoinPrice);
+    
+    if (!newsletterContent) {
+      throw new Error('Failed to generate newsletter content');
+    }
 
     // Create campaign
     const campaign = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns`, {
