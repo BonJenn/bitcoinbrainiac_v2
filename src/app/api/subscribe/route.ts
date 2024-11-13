@@ -1,22 +1,27 @@
 import { NextResponse } from 'next/server';
-import mailchimp from '@mailchimp/mailchimp_marketing';
 
-mailchimp.setConfig({
-  apiKey: process.env.MAILCHIMP_API_KEY,
-  server: process.env.MAILCHIMP_SERVER_PREFIX
-});
+export const runtime = 'edge';
 
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
     
-    const response = await mailchimp.lists.addListMember(
-      process.env.MAILCHIMP_LIST_ID!,
-      {
+    const response = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/lists/${process.env.MAILCHIMP_LIST_ID}/members`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         email_address: email,
-        status: 'subscribed'
-      }
-    );
+        status: 'subscribed',
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || 'Failed to subscribe');
+    }
     
     return NextResponse.json({ success: true });
   } catch (error: any) {

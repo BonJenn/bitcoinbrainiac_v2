@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@mailchimp/mailchimp_marketing": "^3.0.80",
     "next": "15.0.3",
     "node-cron": "^3.0.3",
     "openai": "^4.72.0",
