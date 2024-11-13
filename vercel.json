@@ -4,15 +4,15 @@
     "schedule": "0 13 * * *"
   }],
   "functions": {
-    "/api/test/news": {
+    "api/test/news": {
       "memory": 3008,
       "maxDuration": 60
     },
-    "/api/scrape": {
+    "api/scrape": {
       "memory": 3008,
       "maxDuration": 60
     },
-    "/api/cron/newsletter": {
+    "api/cron/newsletter": {
       "memory": 3008,
       "maxDuration": 60
     }
