@@ -23,6 +23,9 @@ export default function MailchimpForm() {
         setEmail('');
       } else {
         setStatus(`Error: ${data.error}`);
+        if (data.error.includes('already subscribed')) {
+          setEmail('');
+        }
       }
     } catch (error) {
       setStatus('Error subscribing. Please try again.');
@@ -47,7 +50,7 @@ export default function MailchimpForm() {
           Subscribe
         </button>
       </div>
-      {status && <p className="mt-2 text-sm text-center">{status}</p>}
+      {status && <p className="mt-2 text-sm text-center text-black">{status}</p>}
       {status === 'success' && (
         <p className="text-black font-bold mt-4">
           Thanks for subscribing! You will now receive daily Bitcoin updates. Unsubscribe anytime.

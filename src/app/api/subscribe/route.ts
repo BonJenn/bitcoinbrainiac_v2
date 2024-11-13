@@ -20,6 +20,12 @@ export async function POST(request: Request) {
 
     if (!response.ok) {
       const error = await response.json();
+      if (error.title === 'Member Exists') {
+        return NextResponse.json(
+          { error: "You're already subscribed to our newsletter!" },
+          { status: 400 }
+        );
+      }
       throw new Error(error.detail || 'Failed to subscribe');
     }
     
