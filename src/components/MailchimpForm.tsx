@@ -48,6 +48,11 @@ export default function MailchimpForm() {
         </button>
       </div>
       {status && <p className="mt-2 text-sm text-center">{status}</p>}
+      {status === 'success' && (
+        <p className="text-black font-bold mt-4">
+          Thanks for subscribing! You will now receive daily Bitcoin updates. Unsubscribe anytime.
+        </p>
+      )}
     </form>
   );
 }
