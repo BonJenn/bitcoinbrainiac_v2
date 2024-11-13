@@ -11,14 +11,14 @@ export async function GET() {
     console.log('Starting newsletter test...');
     
     // Set timeout for the entire operation
-    const timeoutPromise = new Promise((_, reject) => 
-      setTimeout(() => reject(new Error('Operation timed out')), 50000)
+    const timeoutPromise = new Promise<never>((_, reject) => 
+      setTimeout(() => reject(new Error('Operation timed out')), 280000)
     );
 
     const resultPromise = Promise.all([
       scrapeBitcoinNews(),
       getBitcoinPrice(),
-    ]);
+    ]) as Promise<[any[], number]>;
 
     const [articles, bitcoinPrice] = await Promise.race([
       resultPromise,
