@@ -1,132 +1,58 @@
-import puppeteer from 'puppeteer';
-
-function isBitcoinRelated(text: string): boolean {
-  const bitcoinTerms = ['bitcoin', 'btc', 'satoshi', 'lightning network'];
-  const text_lower = text.toLowerCase();
-  return bitcoinTerms.some(term => text_lower.includes(term));
-}
+import puppeteer from 'puppeteer-core';
+import chrome from '@sparticuz/chromium';
 
 export async function scrapeBitcoinNews() {
-  console.log('Initializing puppeteer...');
+  console.log('Starting scrape with Puppeteer in production mode...');
+  
   const browser = await puppeteer.launch({
+    args: [...chrome.args, '--no-sandbox'],
+    executablePath: await chrome.executablePath({
+      channel: 'chrome',
+    }),
+    defaultViewport: chrome.defaultViewport,
     headless: true,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-accelerated-2d-canvas',
-      '--disable-gpu',
-      '--window-size=1920x1080'
-    ]
   });
   
   try {
-    console.log('Browser launched successfully');
-    const allArticles = [];
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(60000); // Increase timeout to 60 seconds
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
     
-    // Set a larger viewport
-    await page.setViewport({
-      width: 1920,
-      height: 1080
+    console.log('Attempting to scrape Cointelegraph...');
+    await page.goto('https://cointelegraph.com/tags/bitcoin', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000
+    });
+    
+    // Wait for content to load
+    await page.waitForSelector('.post-card-inline', { timeout: 10000 });
+    
+    const articles = await page.evaluate(() => {
+      const elements = document.querySelectorAll('.post-card-inline');
+      return Array.from(elements, article => {
+        const titleEl = article.querySelector('.post-card-inline__title');
+        const summaryEl = article.querySelector('.post-card-inline__text');
+        
+        const title = titleEl?.textContent?.trim();
+        const summary = summaryEl?.textContent?.trim();
+        
+        if (!title || !summary) return null;
+        
+        return {
+          title,
+          summary,
+          source: 'Cointelegraph',
+          timestamp: new Date().toISOString(),
+          fullText: `${title} ${summary}`
+        };
+      }).filter(Boolean).slice(0, 5);
     });
 
-    console.log('Attempting to scrape CoinGecko...');
-    try {
-      await page.goto('https://www.coingecko.com/en/news/bitcoin', {
-        waitUntil: 'networkidle0'
-      });
-      console.log('Successfully loaded CoinGecko page');
-      
-      await page.waitForSelector('article');
-      console.log('Found article elements on CoinGecko');
-
-      const coingeckoArticles = await page.evaluate(() => {
-        const articleElements = document.querySelectorAll('article');
-        return Array.from(articleElements, article => {
-          const titleElement = article.querySelector('h2');
-          const summaryElement = article.querySelector('p');
-          const title = titleElement ? titleElement.textContent?.trim() : '';
-          const summary = summaryElement ? summaryElement.textContent?.trim() : '';
-          
-          return {
-            title,
-            summary,
-            source: 'CoinGecko News',
-            timestamp: new Date().toISOString(),
-            fullText: `${title} ${summary}`
-          };
-        });
-      });
-
-      // Filter for Bitcoin-related articles
-      const bitcoinArticles = coingeckoArticles
-        .filter(article => isBitcoinRelated(article.fullText))
-        .slice(0, 3);
-
-      allArticles.push(...bitcoinArticles);
-    } catch (error) {
-      console.error('Detailed CoinGecko scraping error:', {
-        message: error.message,
-        stack: error.stack,
-        name: error.name
-      });
+    if (!articles || articles.length === 0) {
+      throw new Error('No articles found on page');
     }
 
-    // Scrape from Bitcoin.com
-    try {
-      await page.goto('https://www.bitcoin.com/news/', {
-        waitUntil: 'networkidle0'
-      });
-      await page.waitForSelector('article');
-
-      const bitcoinComArticles = await page.evaluate(() => {
-        const articleElements = document.querySelectorAll('article');
-        return Array.from(articleElements, article => {
-          const titleElement = article.querySelector('h2, h3');
-          const summaryElement = article.querySelector('p');
-          const title = titleElement ? titleElement.textContent?.trim() : '';
-          const summary = summaryElement ? summaryElement.textContent?.trim() : '';
-          
-          return {
-            title,
-            summary,
-            source: 'Bitcoin.com',
-            timestamp: new Date().toISOString(),
-            fullText: `${title} ${summary}`
-          };
-        });
-      });
-
-      // Filter for Bitcoin-related articles
-      const bitcoinArticles = bitcoinComArticles
-        .filter(article => isBitcoinRelated(article.fullText))
-        .slice(0, 3);
-
-      allArticles.push(...bitcoinArticles);
-    } catch (error) {
-      console.error('Error scraping Bitcoin.com:', error);
-    }
-
-    // Remove fullText field before returning
-    const cleanedArticles = allArticles.map(({ fullText, ...rest }) => rest);
-
-    if (cleanedArticles.length === 0) {
-      throw new Error('No Bitcoin-specific articles found');
-    }
-
-    console.log('Successfully scraped articles:', cleanedArticles);
-    return cleanedArticles;
-  } catch (error) {
-    console.error('Detailed scraping error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    });
-    throw error;
+    return articles;
   } finally {
     await browser.close();
-    console.log('Browser closed');
   }
 }

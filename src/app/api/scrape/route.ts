@@ -7,21 +7,24 @@ export async function GET() {
   try {
     console.log('Starting scraping process...');
     const articles = await scrapeBitcoinNews();
-    console.log('Scraped articles:', articles);
     
     if (!articles || articles.length === 0) {
+      console.error('No articles found during scraping');
       throw new Error('No articles were scraped');
     }
     
+    console.log('Successfully scraped articles:', articles);
     return NextResponse.json({ articles });
   } catch (error: any) {
-    console.error('Detailed scraping error:', {
+    console.error('Scraping failed:', {
       message: error.message,
       stack: error.stack,
-      name: error.name
+      name: error.name,
+      fullError: error
     });
+    
     return NextResponse.json({ 
-      error: error.message,
+      error: `Scraping failed: ${error.message}`,
       details: error.stack 
     }, { status: 500 });
   }

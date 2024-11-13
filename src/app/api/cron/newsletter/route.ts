@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { generateNewsletter } from '@/lib/openai';
 import { getBitcoinPrice } from '@/lib/price';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET(request: Request) {
   try {
@@ -69,6 +69,7 @@ export async function GET(request: Request) {
     }
 
     const campaignData = await campaign.json();
+    console.log('Campaign created:', campaignData);
 
     // Set campaign content
     const contentResponse = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaignData.id}/content`, {
@@ -94,17 +95,33 @@ export async function GET(request: Request) {
       throw new Error(`Failed to set campaign content: ${JSON.stringify(contentError)}`);
     }
 
-    return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Newsletter error:', {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
+    // Send the campaign immediately
+    const sendResponse = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaignData.id}/actions/send`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
     });
+
+    if (!sendResponse.ok) {
+      const sendError = await sendResponse.json();
+      throw new Error(`Failed to send campaign: ${JSON.stringify(sendError)}`);
+    }
+
+    console.log('Newsletter sent successfully');
     return NextResponse.json({ 
-      error: error.message,
-      details: error.stack 
-    }, { status: 500 });
+      success: true,
+      message: 'Newsletter campaign created and sent successfully'
+    });
+    
+  } catch (error: any) {
+    console.error('Newsletter error:', error);
+    return NextResponse.json({ 
+      error: error.message || 'Failed to generate or send newsletter'
+    }, { 
+      status: 500 
+    });
   }
 }
 
