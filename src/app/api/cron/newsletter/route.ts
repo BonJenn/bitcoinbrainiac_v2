@@ -41,7 +41,7 @@ export async function GET(request: Request) {
       throw new Error('Failed to generate newsletter content');
     }
 
-    // Create campaign
+    // Create campaign with verified sender email
     const campaign = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns`, {
       method: 'POST',
       headers: {
@@ -52,13 +52,16 @@ export async function GET(request: Request) {
         type: 'regular',
         recipients: {
           list_id: process.env.MAILCHIMP_LIST_ID,
+          segment_opts: {
+            saved_segment_id: process.env.MAILCHIMP_SEGMENT_ID // Optional: for targeting specific subscribers
+          }
         },
         settings: {
           subject_line: `Bitcoin Daily: BTC at $${bitcoinPrice.toLocaleString()}`,
           preview_text: 'Your daily dose of Bitcoin news',
           title: `Bitcoin Newsletter - ${new Date().toLocaleDateString()}`,
           from_name: 'Bitcoin Brainiac',
-          reply_to: process.env.MAILCHIMP_REPLY_TO,
+          reply_to: 'verified@yourdomain.com', // Replace with your verified sender email
         },
       }),
     });
@@ -82,8 +85,20 @@ export async function GET(request: Request) {
         html: `
           <!DOCTYPE html>
           <html>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px;">
-              ${newsletterContent.replace(/\n/g, '<br>')}
+            <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+              <div style="border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 20px;">
+                <h1 style="color: #1a1a1a; font-size: 24px; margin: 0;">Bitcoin Market Intelligence</h1>
+                <p style="color: #666; font-size: 14px; margin: 5px 0 0;">Daily Market Report - ${new Date().toLocaleDateString()}</p>
+              </div>
+              ${newsletterContent.split('\n\n').map(paragraph => 
+                `<p style="margin: 0 0 15px;">${paragraph}</p>`
+              ).join('')}
+              <div style="border-top: 2px solid #eee; margin-top: 20px; padding-top: 20px; font-size: 12px; color: #666;">
+                <p>This report is provided for informational purposes only.</p>
+              </div>
             </body>
           </html>
         `,
