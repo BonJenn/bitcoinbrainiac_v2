@@ -1,7 +1,7 @@
 {
   "crons": [{
     "path": "/api/cron/newsletter",
-    "schedule": "0 13 * * *"
+    "schedule": "0 13 * * 1-5"
   }],
   "functions": {
     "src/app/api/test/news/route.ts": {
