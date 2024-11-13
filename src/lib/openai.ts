@@ -6,19 +6,20 @@ const openai = new OpenAI({
 
 export async function generateNewsletter(articles: any[], bitcoinPrice: number) {
   const prompt = `
-    Create a friendly, conversational Bitcoin newsletter.
+    Create a concise, factual Bitcoin market update.
     Guidelines:
-    - Write like you're explaining to a friend
-    - Keep it super brief and engaging
-    - Use clear, simple language
-    - Make it scannable with bold headings
+    - Use precise, data-driven language
+    - Focus on price action and key market movements
+    - Include specific numbers and percentages
+    - Maintain neutral, journalistic tone
+    - No emojis or casual language
     
     Structure:
-    1. **Today's Bitcoin Price** (Quick price update and simple observation)
-    2. **What's New** (2-3 key stories in plain language)
-    3. **Bottom Line** (One friendly takeaway)
+    1. **Market Update** (Current price, recent movement, key levels)
+    2. **Key Developments** (2-3 most significant news items)
+    3. **Market Context** (Brief technical or fundamental insight)
     
-    Tone: Knowledgeable friend sharing updates
+    Tone: Professional market reporting, similar to Bloomberg or Reuters
     Length: 150-200 words maximum
   `;
 
