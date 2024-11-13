@@ -2,5 +2,19 @@
   "crons": [{
     "path": "/api/cron/newsletter",
     "schedule": "0 13 * * *"
-  }]
+  }],
+  "functions": {
+    "api/test/news": {
+      "memory": 3008,
+      "maxDuration": 60
+    },
+    "api/scrape": {
+      "memory": 3008,
+      "maxDuration": 60
+    },
+    "api/cron/newsletter": {
+      "memory": 3008,
+      "maxDuration": 60
+    }
+  }
 }

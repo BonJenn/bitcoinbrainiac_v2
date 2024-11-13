@@ -2,9 +2,13 @@ import { Suspense } from 'react';
 import { headers } from 'next/headers';
 
 async function fetchAnalytics() {
+  const headersList = headers();
   const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/analytics`, {
-    headers: headers(),
-    next: { revalidate: 3600 } // Cache for 1 hour
+    headers: {
+      'Content-Type': 'application/json',
+      // Add any other required headers
+    },
+    next: { revalidate: 3600 }
   });
   return response.json();
 }

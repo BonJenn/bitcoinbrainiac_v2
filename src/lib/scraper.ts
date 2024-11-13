@@ -5,15 +5,15 @@ export async function scrapeBitcoinNews() {
   console.log('Starting scrape with Puppeteer in production mode...');
   
   const browser = await puppeteer.launch({
-    args: [...chrome.args, '--no-sandbox'],
-    executablePath: await chrome.executablePath({
-      channel: 'chrome',
-    }),
+    args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox'],
     defaultViewport: chrome.defaultViewport,
-    headless: true,
+    executablePath: await chrome.executablePath(),
+    headless: "new",
+    ignoreHTTPSErrors: true
   });
   
   try {
+    console.log('Browser launched, creating page...');
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
     
@@ -23,11 +23,13 @@ export async function scrapeBitcoinNews() {
       timeout: 30000
     });
     
-    // Wait for content to load
-    await page.waitForSelector('.post-card-inline', { timeout: 10000 });
+    // Add a delay to ensure content loads
+    await new Promise(r => setTimeout(r, 5000));
     
+    console.log('Page loaded, evaluating content...');
     const articles = await page.evaluate(() => {
       const elements = document.querySelectorAll('.post-card-inline');
+      console.log('Found elements:', elements.length);
       return Array.from(elements, article => {
         const titleEl = article.querySelector('.post-card-inline__title');
         const summaryEl = article.querySelector('.post-card-inline__text');
@@ -51,8 +53,14 @@ export async function scrapeBitcoinNews() {
       throw new Error('No articles found on page');
     }
 
+    console.log(`Successfully scraped ${articles.length} articles`);
     return articles;
+  } catch (error) {
+    console.error('Scraping error:', error);
+    throw error;
   } finally {
-    await browser.close();
+    if (browser) {
+      await browser.close();
+    }
   }
 }
