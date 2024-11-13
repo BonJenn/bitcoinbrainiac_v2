@@ -101,8 +101,8 @@ export async function GET(request: Request) {
               ${newsletterContent
                 .split('\n\n')
                 .map(paragraph => {
-                  // Convert **text** to bold HTML
-                  const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #1a1a1a; font-size: 18px; display: block; margin-top: 20px;">$1</strong>');
+                  // Convert **text** to bold HTML while preserving existing HTML
+                  const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                   return `<p style="margin: 0 0 15px;">${boldText}</p>`;
                 })
                 .join('')}

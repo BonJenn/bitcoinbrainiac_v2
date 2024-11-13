@@ -4,7 +4,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateNewsletter(articles: any[], bitcoinPrice: number) {
+export async function generateNewsletter(articles: any[], bitcoinData: { price: number, change24h: number }) {
+  const priceColor = bitcoinData.change24h >= 0 ? 'green' : 'red';
+  const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
+  
   const prompt = `
     Create a concise, factual Bitcoin market update.
     Guidelines:
@@ -13,6 +16,8 @@ export async function generateNewsletter(articles: any[], bitcoinPrice: number) 
     - Include specific numbers and percentages
     - Maintain neutral, journalistic tone
     - No emojis or casual language
+    - Use this exact price format for the first mention: ${formattedPrice}
+    - For subsequent price mentions, use normal formatting
     
     Structure:
     1. **Market Update** (Current price, recent movement, key levels)
