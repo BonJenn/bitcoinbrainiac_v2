@@ -5,6 +5,7 @@ import { useState } from 'react';
 export default function MailchimpForm() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('');
+  const [message, setMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,10 +20,12 @@ export default function MailchimpForm() {
       
       const data = await response.json();
       if (response.ok) {
-        setStatus('Successfully subscribed!');
+        setStatus('success');
         setEmail('');
+        setMessage(data.message || 'Please check your email to confirm your subscription');
       } else {
-        setStatus(`Error: ${data.error}`);
+        setStatus('error');
+        setMessage(data.error);
         if (data.error.includes('already subscribed')) {
           setEmail('');
         }
@@ -31,6 +34,18 @@ export default function MailchimpForm() {
       setStatus('Error subscribing. Please try again.');
     }
   };
+
+  const SuccessMessage = () => (
+    <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <h3 className="text-green-800 font-semibold mb-2">Almost there!</h3>
+      <p className="text-green-700">
+        We've sent you a confirmation email. Please click the link in the email to complete your subscription.
+      </p>
+      <p className="text-green-600 text-sm mt-2">
+        (Don't forget to check your spam folder if you don't see it)
+      </p>
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -56,6 +71,8 @@ export default function MailchimpForm() {
           Thanks for subscribing! You will now receive daily Bitcoin updates. Unsubscribe anytime.
         </p>
       )}
+      {message && <p className="mt-2 text-sm text-center text-black">{message}</p>}
+      {status === 'success' && <SuccessMessage />}
     </form>
   );
 }

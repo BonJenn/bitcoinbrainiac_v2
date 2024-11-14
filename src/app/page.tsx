@@ -20,7 +20,7 @@ export default function Home() {
               Less Crypto Chaos.
             </h1>
             <p className="text-xl mb-8 text-black px-4 md:px-0">
-              Daily Bitcoin news delivered straight to your inbox.
+              A newsletter for serious Bitcoin investors.
             </p>
             <div className="px-4 md:px-0">
               <MailchimpForm />

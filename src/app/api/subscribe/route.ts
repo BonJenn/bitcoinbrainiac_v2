@@ -14,7 +14,8 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         email_address: email,
-        status: 'subscribed',
+        status: 'pending',
+        status_if_new: 'pending'
       }),
     });
 
@@ -29,7 +30,10 @@ export async function POST(request: Request) {
       throw new Error(error.detail || 'Failed to subscribe');
     }
     
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      message: 'Please check your email to confirm your subscription'
+    });
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'Error subscribing to newsletter' },

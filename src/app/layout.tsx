@@ -15,7 +15,16 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Bitcoin Brainiac",
-  description: "Bitcoin news and analysis delivered to your inbox daily.",
+  description: "The daily newsletter for serious Bitcoin investors.",
+  icons: {
+    icon: "./favicon.ico",
+    shortcut: "./favicon.ico",
+    apple: "./apple-touch-icon.png",
+    other: {
+      rel: "apple-touch-icon-precomposed",
+      url: "./apple-touch-icon-precomposed.png",
+    },
+  },
 };
 
 export default function RootLayout({
