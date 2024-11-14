@@ -22,7 +22,6 @@ export default function MailchimpForm() {
       if (response.ok) {
         setStatus('success');
         setEmail('');
-        setMessage(data.message || 'Please check your email to confirm your subscription');
       } else {
         setStatus('error');
         setMessage(data.error);
@@ -66,11 +65,6 @@ export default function MailchimpForm() {
         </button>
       </div>
       {status && <p className="mt-2 text-sm text-center text-black">{status}</p>}
-      {status === 'success' && (
-        <p className="text-black font-bold mt-4">
-          Thanks for subscribing! You will now receive daily Bitcoin updates. Unsubscribe anytime.
-        </p>
-      )}
       {message && <p className="mt-2 text-sm text-center text-black">{message}</p>}
       {status === 'success' && <SuccessMessage />}
     </form>

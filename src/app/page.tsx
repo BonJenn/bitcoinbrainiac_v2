@@ -5,7 +5,7 @@ import MailchimpForm from '@/components/MailchimpForm';
 export default function Home() {
   return (
     <div 
-      className="min-h-screen flex flex-col"
+      className="flex flex-col"
       style={{
         background: 'radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%)'
       }}
