@@ -36,7 +36,6 @@ export async function GET(request: Request) {
     console.log('Bitcoin price:', bitcoinPrice);
 
     const newsletterContent = await generateNewsletter(data.articles, bitcoinPrice);
-    
     if (!newsletterContent) {
       throw new Error('Failed to generate newsletter content');
     }
