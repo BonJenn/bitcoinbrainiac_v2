@@ -9,7 +9,7 @@ export async function scrapeBitcoinNews() {
       width: 1200,
       height: 800
     },
-    headless: "new"
+    headless: true
   });
   
   try {
