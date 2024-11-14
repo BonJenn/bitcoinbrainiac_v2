@@ -1,18 +1,15 @@
-import puppeteer from 'puppeteer-core';
-import chrome from '@sparticuz/chromium';
+import puppeteer from 'puppeteer';
 
 export async function scrapeBitcoinNews() {
-  console.log('Starting scrape with Puppeteer in production mode...');
+  console.log('Starting scrape with Puppeteer...');
   
   const browser = await puppeteer.launch({
-    args: [...chrome.args, '--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
     defaultViewport: {
       width: 1200,
       height: 800
     },
-    executablePath: await chrome.executablePath(),
-    headless: true,
-    ignoreHTTPSErrors: true
+    headless: "new"
   });
   
   try {
@@ -24,11 +21,11 @@ export async function scrapeBitcoinNews() {
     
     console.log('Attempting to scrape Cointelegraph...');
     await page.goto('https://cointelegraph.com/tags/bitcoin', {
-      waitUntil: 'domcontentloaded',
+      waitUntil: 'networkidle0',
       timeout: 15000
     });
     
-    await page.waitForSelector('.post-card-inline', { timeout: 10000 });
+    await page.waitForSelector('.post-card-inline');
     
     const articles = await page.evaluate(() => {
       const elements = document.querySelectorAll('.post-card-inline');

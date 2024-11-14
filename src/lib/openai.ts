@@ -9,24 +9,23 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
   const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
   
   const prompt = `
-    Create a conversational yet professional Bitcoin market update.
+    Deliver an authoritative market update.
     Guidelines:
-    - Use a mix of data and narrative storytelling
-    - Include specific numbers and percentages
-    - Reference relevant political/regulatory context
-    - Use em dashes for asides and side notes
-    - Include forward-looking predictions or expert opinions
-    - Feel free to use bullet points for key developments
+    - Write with firsthand authority - you're breaking this news
+    - Lead with what matters most right now
+    - Back statements with specific data points
+    - Include forward-looking analysis
+    - Use em dashes for insider context
     - Use this exact price format for the first mention: ${formattedPrice}
     
     Structure:
-    1. Opening hook with current price and major narrative
-    2. Key developments (bullet points welcome)
-    3. Political/regulatory context if relevant
-    4. Expert opinions or market predictions
-    5. Forward-looking conclusion
+    1. Price and dominant market narrative
+    2. Critical developments
+    3. Regulatory impact if relevant
+    4. Your market analysis
+    5. What to watch for next
     
-    Tone: Similar to Morning Brew or Axios - smart but conversational
+    Tone: Authoritative and direct - you're the source, not the messenger
     Length: 200-250 words
   `;
 
@@ -35,7 +34,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     messages: [
       {
         role: "system",
-        content: "You are a friendly Bitcoin expert writing for a community of interested readers. Make complex topics accessible while maintaining credibility."
+        content: "You are a seasoned financial analyst specializing in Bitcoin and digital assets. Your writing style is clear, analytical, and professionally measured."
       },
       {
         role: "user",

@@ -9,10 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "puppeteer-core": "^22.0.0",
     "@sparticuz/chromium": "^121.0.0",
     "next": "15.0.3",
-    "openai": "^4.72.0"
+    "openai": "^4.72.0",
+    "puppeteer": "^23.8.0",
+    "puppeteer-core": "^22.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",

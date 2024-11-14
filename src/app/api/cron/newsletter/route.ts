@@ -88,10 +88,10 @@ export async function GET(request: Request) {
             <head>
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
             </head>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-              <div style="border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 20px;">
-                <h1 style="color: #1a1a1a; font-size: 24px; margin: 0;">Bitcoin Daily Update</h1>
-                <p style="color: #666; font-size: 14px; margin: 5px 0 0;">${new Date().toLocaleDateString('en-US', { 
+            <body style="font-family: Arial, sans-serif; line-height: 1.8; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+              <div style="border-bottom: 2px solid #ffa500; margin-bottom: 20px; padding-bottom: 20px;">
+                <h1 style="color: #1a1a1a; font-size: 28px; margin: 0;">Bitcoin Daily Update</h1>
+                <p style="color: #666; font-size: 16px; margin: 5px 0 0;">${new Date().toLocaleDateString('en-US', { 
                   weekday: 'long',
                   year: 'numeric',
                   month: 'long',
@@ -101,13 +101,12 @@ export async function GET(request: Request) {
               ${newsletterContent
                 .split('\n\n')
                 .map(paragraph => {
-                  // Convert **text** to bold HTML while preserving existing HTML
                   const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                  return `<p style="margin: 0 0 15px;">${boldText}</p>`;
+                  return `<p style="margin: 0 0 15px; font-size: 16px; line-height: 1.8;">${boldText}</p>`;
                 })
                 .join('')}
-              <div style="border-top: 2px solid #eee; margin-top: 20px; padding-top: 20px; font-size: 12px; color: #666;">
-                <p>Have thoughts about Bitcoin? Just hit reply!</p>
+              <div style="border-top: 2px solid #ffa500; margin-top: 20px; padding-top: 20px; font-size: 14px; color: #666;">
+                <p>Always remember - not your keys, not your coins.</p>
               </div>
             </body>
           </html>
