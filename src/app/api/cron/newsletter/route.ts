@@ -98,12 +98,12 @@ export async function GET(request: Request) {
                 })}</p>
               </div>
               ${newsletterContent
-                .split('\n\n')
+                ?.split('\n\n')
                 .map(paragraph => {
                   const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                   return `<p style="margin: 0 0 15px; font-size: 16px; line-height: 1.8;">${boldText}</p>`;
                 })
-                .join('')}
+                .join('') || ''}
               <div style="border-top: 2px solid #ffa500; margin-top: 20px; padding-top: 20px; font-size: 14px; color: #666;">
                 <p>Always remember - not your keys, not your coins.</p>
               </div>

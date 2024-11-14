@@ -22,6 +22,8 @@ export async function GET(request: Request) {
     console.log('Generating newsletter content...');
     const content = await generateNewsletter(articles, bitcoinData);
     
+    if (!content) throw new Error('Failed to generate newsletter content');
+
     // Create test campaign
     const campaign = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns`, {
       method: 'POST',
@@ -82,13 +84,12 @@ export async function GET(request: Request) {
                 })}</p>
               </div>
               ${content
-                .split('\n\n')
+                ?.split('\n\n')
                 .map(paragraph => {
-                  // Convert **text** to bold HTML while preserving existing HTML
                   const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                   return `<p style="margin: 0 0 15px; font-size: 16px; line-height: 1.8;">${boldText}</p>`;
                 })
-                .join('')}
+                .join('') || ''}
               <div style="border-top: 2px solid #ffa500; margin-top: 20px; padding-top: 20px; font-size: 14px; color: #666;">
                 <p>Have thoughts about Bitcoin? Just hit reply!</p>
               </div>
