@@ -3,7 +3,7 @@ const nextConfig = {
   serverExternalPackages: ['@prisma/client'],
   webpack: (config, { isServer }) => {
     if (isServer) {
-      config.externals = [...config.externals, 'axios', 'uuid'];
+      config.externals = [...config.externals, 'axios', 'uuid', 'supports-color'];
     }
     return config;
   }

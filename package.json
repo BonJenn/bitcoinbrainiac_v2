@@ -15,7 +15,8 @@
     "next": "15.0.3",
     "openai": "^4.72.0",
     "puppeteer": "^23.8.0",
-    "puppeteer-core": "^22.0.0"
+    "puppeteer-core": "^22.0.0",
+    "supports-color": "^9.4.0"
   },
   "devDependencies": {
     "@types/node": "20.17.6",
