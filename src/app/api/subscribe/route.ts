@@ -5,7 +5,7 @@ import md5 from 'js-md5';
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
-    const subscriberHash = md5(email.toLowerCase());
+    const subscriberHash = md5.hex(email.toLowerCase());
 
     if (!process.env.MAILCHIMP_API_KEY || !process.env.MAILCHIMP_SERVER_PREFIX) {
       throw new Error('Missing required Mailchimp configuration');
