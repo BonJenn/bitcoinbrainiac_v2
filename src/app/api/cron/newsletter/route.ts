@@ -118,7 +118,7 @@ export async function GET(request: Request) {
       throw new Error(`Failed to set campaign content: ${JSON.stringify(contentError)}`);
     }
 
-    // Send the campaign immediately
+    // Send the campaign
     const sendResponse = await fetch(`https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaignData.id}/actions/send`, {
       method: 'POST',
       headers: {
@@ -132,10 +132,9 @@ export async function GET(request: Request) {
       throw new Error(`Failed to send campaign: ${JSON.stringify(sendError)}`);
     }
 
-    console.log('Newsletter sent successfully');
     return NextResponse.json({ 
       success: true,
-      message: 'Newsletter campaign created and sent successfully'
+      message: 'Newsletter sent successfully'
     });
     
   } catch (error: any) {
