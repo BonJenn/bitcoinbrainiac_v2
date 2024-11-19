@@ -12,6 +12,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     Deliver an authoritative market update.
     Guidelines:
     - Write with firsthand authority - you're breaking this news
+    - Make the first sentence of each section bold using **double asterisks**
     - Lead with what matters most right now
     - Back statements with specific data points
     - Include forward-looking analysis
@@ -19,11 +20,11 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     - Use this exact price format for the first mention: ${formattedPrice}
     
     Structure:
-    1. Price and dominant market narrative
-    2. Critical developments
-    3. Regulatory impact if relevant
-    4. Your market analysis
-    5. What to watch for next
+    1. Price and dominant market narrative (first sentence bold)
+    2. Critical developments (first sentence bold)
+    3. Regulatory impact if relevant (first sentence bold)
+    4. Your market analysis (first sentence bold)
+    5. What to watch for next (first sentence bold)
     
     Tone: Authoritative and direct - you're the source, not the messenger
     Length: 200-250 words
