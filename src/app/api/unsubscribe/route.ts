@@ -1,13 +1,15 @@
 import { NextResponse } from 'next/server';
 import mailchimp from '@mailchimp/mailchimp_marketing';
-import md5 from 'js-md5';
+import { createHash } from 'crypto';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
-    const subscriberHash = md5.hex(email.toLowerCase());
+    const subscriberHash = createHash('md5')
+      .update(email.toLowerCase())
+      .digest('hex');
 
     if (!process.env.MAILCHIMP_API_KEY || !process.env.MAILCHIMP_SERVER_PREFIX) {
       throw new Error('Missing required Mailchimp configuration');
