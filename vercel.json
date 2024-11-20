@@ -4,21 +4,9 @@
     "schedule": "0 13 * * 1-5"
   }],
   "functions": {
-    "src/app/api/test/news/route.ts": {
-      "memory": 3008,
-      "maxDuration": 300
-    },
-    "src/app/api/scrape/route.ts": {
-      "memory": 3008,
-      "maxDuration": 300
-    },
-    "src/app/api/test/newsletter/route.ts": {
-      "memory": 3008,
-      "maxDuration": 300
-    },
-    "src/app/api/cron/newsletter/route.ts": {
-      "memory": 3008,
-      "maxDuration": 300
+    "src/app/api/newsletters/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
     }
   }
 }

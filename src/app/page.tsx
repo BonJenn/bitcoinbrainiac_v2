@@ -1,18 +1,40 @@
+'use client';
+
 import Image from 'next/image';
-import Header from '@/components/Header';
+import { useEffect, useState } from 'react';
 import MailchimpForm from '@/components/MailchimpForm';
+import HomeNewsletterFeed from '@/components/HomeNewsletterFeed';
+import { Newsletter } from '@/types/newsletter';
 
 export default function Home() {
+  const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
+
+  useEffect(() => {
+    async function fetchNewsletters() {
+      try {
+        console.log('Fetching newsletters...');
+        const response = await fetch('/api/newsletters');
+        console.log('Newsletter response:', response);
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Newsletter data:', data);
+          setNewsletters(data);
+        } else {
+          console.error('Failed to fetch newsletters:', await response.text());
+        }
+      } catch (error) {
+        console.error('Failed to fetch newsletters:', error);
+      }
+    }
+
+    fetchNewsletters();
+  }, []);
+
   return (
-    <div 
-      className="flex flex-col"
-      style={{
-        background: 'radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%)'
-      }}
-    >
-      <Header />
-      <main className="flex-1 flex">
-        <div className="container mx-auto px-4 py-12 md:py-20 flex flex-col md:flex-row items-center justify-between gap-12">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-12 md:py-20">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-12 mb-20">
           <div className="flex-1 max-w-2xl">
             <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight text-black px-4 md:px-0">
               Daily Bitcoin News.
@@ -38,7 +60,9 @@ export default function Home() {
             />
           </div>
         </div>
-      </main>
+        
+        {newsletters.length > 0 && <HomeNewsletterFeed newsletters={newsletters} />}
+      </div>
     </div>
   );
 }
