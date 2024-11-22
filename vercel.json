@@ -4,11 +4,7 @@
     "schedule": "0 14 * * *"
   }],
   "functions": {
-    "src/app/api/**/*.ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    },
-    "src/lib/**/*.ts": {
+    "/app/api/**/*": {
       "memory": 1024,
       "maxDuration": 10
     }
