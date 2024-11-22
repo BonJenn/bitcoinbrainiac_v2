@@ -1,5 +1,12 @@
 import mongoose from 'mongoose';
 
+declare global {
+  var mongoose: {
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
+  };
+}
+
 const MONGODB_URI = process.env.DATABASE_URL;
 
 if (!MONGODB_URI) {
@@ -24,7 +31,7 @@ export async function connectToDatabase() {
     
     const conn = await mongoose.connect(MONGODB_URI);
     console.log('Connected to database successfully');
-    console.log('Database name:', conn.connection.db.databaseName);
+    console.log('Database name:', conn.connection.db?.databaseName);
     
     return conn;
   } catch (error) {
