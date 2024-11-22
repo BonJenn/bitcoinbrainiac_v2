@@ -19,6 +19,10 @@ export async function sendNewsletter() {
     const bitcoinData = await fetchBitcoinData();
     console.log('Data fetched:', { articlesCount: articles?.length, bitcoinPrice: bitcoinData?.price });
 
+    if (!bitcoinData) {
+      throw new Error('Failed to fetch Bitcoin data');
+    }
+
     console.log('Generating newsletter content...');
     const content = await generateNewsletter(articles, bitcoinData);
     console.log('Newsletter content generated');
