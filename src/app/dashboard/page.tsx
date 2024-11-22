@@ -5,7 +5,6 @@ import { ErrorLog } from '@/types/error';
 import StatCard from '@/components/StatCard';
 import ErrorCard from '@/components/ErrorCard';
 import StatusIndicator from '@/components/StatusIndicator';
-import AnalyticsChart from '@/components/AnalyticsChart';
 import { useWebSocket } from '@/hooks/useWebSocket';
 
 export default function Dashboard() {
