@@ -9,25 +9,58 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
   const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
   
   const prompt = `
-    Deliver an authoritative market update.
-    Guidelines:
-    - Write with firsthand authority - you're breaking this news
-    - Make the first sentence of each section bold using **double asterisks**
-    - Lead with what matters most right now
-    - Back statements with specific data points
-    - Include forward-looking analysis
-    - Use em dashes for insider context
-    - Use this exact price format for the first mention: ${formattedPrice}
+    Create a well-structured Bitcoin market update with clear sections.
     
-    Structure:
-    1. Price and dominant market narrative (first sentence bold)
-    2. Critical developments (first sentence bold)
-    3. Regulatory impact if relevant (first sentence bold)
-    4. Your market analysis (first sentence bold)
-    5. What to watch for next (first sentence bold)
+    Format Requirements:
+    - Use HTML formatting for structure
+    - Each section should have an <h3> heading
+    - Use <p> tags for paragraphs
+    - Use <strong> for bold text
+    - Add line breaks between sections
+    - First sentence of each section should be bold
+    - Include bullet points where relevant using <ul> and <li>
     
-    Tone: Authoritative and direct - you're the source, not the messenger
-    Length: 200-250 words
+    Required Sections:
+    1. Market Overview
+       - Lead with current price: ${formattedPrice}
+       - Include dominant market narrative
+    
+    2. Key Developments
+       - Major news or events
+       - Market-moving updates
+    
+    3. Institutional Adoption
+       - Recent institutional investments
+       - Corporate treasury updates
+       - ETF inflows/outflows
+       - Notable public statements from institutions
+    
+    4. Technical Analysis
+       - Support/resistance levels
+       - Key indicators
+       - Volume analysis
+    
+    5. Market Sentiment
+       - Institutional activity
+       - Trading volume patterns
+       - Derivatives market overview
+    
+    6. Looking Ahead
+       - Key events to watch
+       - Potential market movers
+       - Institutional developments to monitor
+    
+    Style:
+    - Professional and authoritative tone
+    - Data-driven analysis
+    - Clear section transitions
+    - 300-350 words total
+    - Emphasize institutional movements and their market impact
+    
+    Note: 
+    - Ensure proper HTML formatting and spacing between sections
+    - Include specific numbers and data points where possible
+    - Highlight institutional flows and their market impact
   `;
 
   const completion = await openai.chat.completions.create({
