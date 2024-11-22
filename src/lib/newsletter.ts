@@ -25,6 +25,11 @@ export async function sendNewsletter() {
 
     console.log('Generating newsletter content...');
     const content = await generateNewsletter(articles, bitcoinData);
+    
+    if (!content) {
+      throw new Error('Failed to generate newsletter content');
+    }
+    
     console.log('Newsletter content generated');
 
     // Create Mailchimp campaign
