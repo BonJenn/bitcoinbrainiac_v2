@@ -1,12 +1,12 @@
 {
   "crons": [{
-    "path": "/api/cron/newsletter",
+    "path": "/api/cron/newsletter/send",
     "schedule": "0 14 * * *"
   }],
   "functions": {
     "app/api/**/*": {
       "memory": 1024,
-      "maxDuration": 10
+      "maxDuration": 60
     }
   }
 }
