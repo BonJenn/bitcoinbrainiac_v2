@@ -14,12 +14,10 @@ export async function GET() {
     // Gather 24h stats
     const [
       newsletterCount,
-      errors,
-      serviceChecks
+      errors
     ] = await Promise.all([
       Newsletter.countDocuments({ sentAt: { $gte: yesterday } }),
-      ErrorLog.find({ timestamp: { $gte: yesterday } }),
-      // Add your service check collection here
+      ErrorLog.find({ timestamp: { $gte: yesterday } })
     ]);
 
     // Calculate uptime
