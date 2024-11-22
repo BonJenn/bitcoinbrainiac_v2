@@ -2,9 +2,16 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
+interface RouteParams {
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: RouteParams
 ) {
   try {
     await connectToDatabase();
