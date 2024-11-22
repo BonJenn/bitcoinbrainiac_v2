@@ -1,12 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['@prisma/client'],
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals = [...config.externals, 'axios', 'uuid', 'supports-color'];
-    }
-    return config;
+  images: {
+    domains: ['bitcoin.com'],
   }
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;

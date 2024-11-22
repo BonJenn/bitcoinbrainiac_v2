@@ -10,7 +10,10 @@ export async function GET() {
     
     if (!articles || articles.length === 0) {
       console.error('No articles found during scraping');
-      throw new Error('No articles were scraped');
+      return NextResponse.json({ 
+        error: 'No articles were found',
+        articles: [] 
+      }, { status: 404 });
     }
     
     console.log('Successfully scraped articles:', articles);
@@ -19,13 +22,12 @@ export async function GET() {
     console.error('Scraping failed:', {
       message: error.message,
       stack: error.stack,
-      name: error.name,
-      fullError: error
+      name: error.name
     });
     
     return NextResponse.json({ 
-      error: `Scraping failed: ${error.message}`,
-      details: error.stack 
+      error: error.message || 'Failed to scrape articles',
+      details: error.stack
     }, { status: 500 });
   }
 }

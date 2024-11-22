@@ -13,13 +13,23 @@ if (!cached) {
 }
 
 export async function connectToDatabase() {
-  if (cached.conn) {
-    return cached.conn;
+  try {
+    console.log('Database connection state:', mongoose.connection.readyState);
+    console.log('Attempting to connect to:', MONGODB_URI);
+    
+    if (mongoose.connection.readyState === 1) {
+      console.log('Already connected to database');
+      return mongoose;
+    }
+    
+    const conn = await mongoose.connect(MONGODB_URI);
+    console.log('Connected to database successfully');
+    console.log('Database name:', conn.connection.db.databaseName);
+    
+    return conn;
+  } catch (error) {
+    console.error('Failed to connect to database:', error);
+    console.error('Connection string used:', MONGODB_URI);
+    throw error;
   }
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI!);
-  }
-  cached.conn = await cached.promise;
-  return cached.conn;
 }

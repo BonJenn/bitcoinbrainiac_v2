@@ -6,49 +6,91 @@ import Newsletter from '@/models/Newsletter';
 import ErrorLog from './error-log';
 import { logError } from '@/lib/logger';
 import mailchimp from '@mailchimp/mailchimp_marketing';
+import mongoose from 'mongoose';
+import { scheduleNewsletters } from '@/config/cron';
 
 export const runtime = 'nodejs';
+
+async function createMailchimpCampaign(bitcoinPrice: number, content: string) {
+  console.log('Setting up Mailchimp with price:', bitcoinPrice);
+  mailchimp.setConfig({
+    apiKey: process.env.MAILCHIMP_API_KEY,
+    server: process.env.MAILCHIMP_SERVER_PREFIX,
+  });
+
+  const formattedPrice = Number(bitcoinPrice).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+
+  const title = `Bitcoin Update: ${formattedPrice}`;
+  console.log('Creating campaign with title:', title);
+  
+  const campaign = await mailchimp.campaigns.create({
+    type: 'regular',
+    recipients: { list_id: process.env.MAILCHIMP_LIST_ID },
+    settings: {
+      subject_line: title,
+      title,
+      from_name: 'Bitcoin Brainiac',
+      reply_to: process.env.MAILCHIMP_REPLY_TO,
+    },
+  });
+
+  await mailchimp.campaigns.setContent(campaign.id, { html: content });
+  await mailchimp.campaigns.send(campaign.id);
+
+  return campaign;
+}
 
 export async function GET(request: Request) {
   const context = 'Newsletter Generation';
   const metadata: any = {};
   
   try {
-    console.log('Starting newsletter generation:', new Date().toISOString());
+    console.log('🚀 Starting newsletter generation:', new Date().toISOString());
     
     // Connect to database
+    console.log('📡 Connecting to database...');
     await connectToDatabase();
+    console.log('✅ Database connected');
     metadata.dbConnection = 'success';
     
     // Scrape articles
-    const scrapeUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/api/scrape`;
+    const baseUrl = process.env.NODE_ENV === 'development' 
+      ? 'http://localhost:3000' 
+      : process.env.NEXT_PUBLIC_BASE_URL;
+    const scrapeUrl = `${baseUrl}/api/scrape`;
     console.log('Fetching articles from:', scrapeUrl);
     const scrapeRes = await fetch(scrapeUrl);
-    
-    if (!scrapeRes.ok) {
-      const errorData = await scrapeRes.json();
-      metadata.scrapeError = errorData;
-      throw new Error(`Failed to fetch articles: ${JSON.stringify(errorData)}`);
-    }
-    
     const data = await scrapeRes.json();
-    metadata.articlesCount = data.articles?.length;
     
-    if (!data.articles || !Array.isArray(data.articles)) {
-      metadata.invalidData = data;
-      throw new Error(`Invalid articles data`);
+    if (!scrapeRes.ok || data.error) {
+      console.error('Scrape response error:', data);
+      throw new Error(data.error || 'Failed to scrape articles');
     }
+    
+    if (!data.articles || !Array.isArray(data.articles) || data.articles.length === 0) {
+      console.error('Invalid articles data:', data);
+      throw new Error('No articles found');
+    }
+    
+    metadata.articlesCount = data.articles.length;
+    console.log(`Found ${data.articles.length} articles`);
     
     // Get Bitcoin price
-    const bitcoinPrice = await getBitcoinPrice();
-    metadata.bitcoinPrice = bitcoinPrice;
-    
-    if (!bitcoinPrice) {
+    const bitcoinData = await getBitcoinPrice();
+    metadata.bitcoinPrice = bitcoinData;
+
+    if (!bitcoinData?.price) {
       throw new Error('Failed to fetch Bitcoin price');
     }
 
     // Generate newsletter
-    const newsletterContent = await generateNewsletter(data.articles, bitcoinPrice);
+    const newsletterContent = await generateNewsletter(data.articles, {
+      price: Number(bitcoinData.price),
+      change24h: Number(bitcoinData.change24h)
+    });
     metadata.contentGenerated = !!newsletterContent;
     
     if (!newsletterContent) {
@@ -56,12 +98,18 @@ export async function GET(request: Request) {
     }
 
     // Create and send campaign
-    const campaign = await createMailchimpCampaign(bitcoinPrice, newsletterContent);
+    const campaign = await createMailchimpCampaign(bitcoinData.price, newsletterContent);
     metadata.campaignId = campaign.id;
     
-    // Store newsletter
-    const newsletter = await storeNewsletter(campaign.id, newsletterContent, bitcoinPrice);
-    metadata.newsletterId = newsletter.id;
+    // Before storing newsletter
+    console.log('💾 About to store newsletter with:', {
+      campaignId: campaign.id,
+      contentLength: newsletterContent?.length,
+      bitcoinPrice: bitcoinData.price
+    });
+    
+    const newsletter = await storeNewsletter(campaign.id, newsletterContent, bitcoinData.price);
+    console.log('✅ Newsletter stored:', newsletter);
 
     return NextResponse.json({ 
       success: true,
@@ -70,6 +118,7 @@ export async function GET(request: Request) {
     });
     
   } catch (error: any) {
+    console.error('❌ Newsletter generation failed:', error);
     await logError(error, context, metadata);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -90,65 +139,44 @@ async function logError(error: any, context: string) {
 
   console.error('Newsletter Error:', errorLog);
 
-  // You could also send this to a logging service
-  try {
-    await fetch(`${process.env.ERROR_LOGGING_URL}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(errorLog)
-    });
-  } catch (logError) {
-    console.error('Failed to log error:', logError);
+  // Only attempt to send to logging service if URL is configured
+  if (process.env.ERROR_LOGGING_URL) {
+    try {
+      await fetch(process.env.ERROR_LOGGING_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorLog)
+      });
+    } catch (logError) {
+      console.error('Failed to log error:', logError);
+    }
   }
 }
 
-export async function sendNewsletter() {
+async function storeNewsletter(campaignId: string, content: string, bitcoinPrice: number) {
   try {
-    // Connect to the database
-    await connectToDatabase();
-
-    // Generate newsletter content
-    const articles = await fetchArticles(); // Implement this function to fetch articles
-    const bitcoinData = await fetchBitcoinData(); // Implement this function to fetch Bitcoin data
-    const content = await generateNewsletter(articles, bitcoinData);
-
-    // Create Mailchimp campaign
-    mailchimp.setConfig({
-      apiKey: process.env.MAILCHIMP_API_KEY,
-      server: process.env.MAILCHIMP_SERVER_PREFIX,
-    });
-
-    const campaign = await mailchimp.campaigns.create({
-      type: 'regular',
-      recipients: { list_id: process.env.MAILCHIMP_LIST_ID },
-      settings: {
-        subject_line: 'Your Bitcoin Newsletter',
-        title: 'Bitcoin Newsletter',
-        from_name: 'Bitcoin Brainiac',
-        reply_to: process.env.MAILCHIMP_REPLY_TO,
-      },
-    });
-
-    // Set campaign content
-    await mailchimp.campaigns.setContent(campaign.id, {
-      html: content,
-    });
-
-    // Send the campaign
-    await mailchimp.campaigns.send(campaign.id);
-
-    // Store the newsletter in the database
+    console.log('Storing newsletter with price:', bitcoinPrice);
+    
     const newsletter = new Newsletter({
+      id: new mongoose.Types.ObjectId().toString(),
       title: 'Bitcoin Newsletter',
+      subtitle: 'Daily Bitcoin Market Update',
       content,
       sentAt: new Date(),
-      bitcoinPrice: bitcoinData.price,
-      priceChange: bitcoinData.change24h,
+      bitcoinPrice,
+      campaignId,
+      priceChange: 0
     });
-    await newsletter.save();
-
-    console.log('Newsletter sent and stored successfully');
+    
+    const saved = await newsletter.save();
+    return saved;
   } catch (error) {
-    console.error('Failed to send newsletter:', error);
+    console.error('Failed to store newsletter:', error);
+    throw error;
   }
+}
+
+// Initialize scheduling when the server starts
+if (process.env.NODE_ENV === 'production') {
+  scheduleNewsletters();
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { sendNewsletter } from './route';
+import { sendNewsletter } from '@/lib/newsletter';
 
 export async function GET() {
   console.log('🚀 Newsletter send endpoint hit');

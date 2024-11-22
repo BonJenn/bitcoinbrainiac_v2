@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import NewsletterFeed from '@/components/NewsletterFeed';
 import { Newsletter } from '@/types/newsletter';
-import Header from '@/components/Header';
 
 export default function NewslettersPage() {
   const [newsletters, setNewsletters] = useState<Newsletter[]>([]);
@@ -12,12 +11,29 @@ export default function NewslettersPage() {
 
   useEffect(() => {
     async function fetchNewsletters() {
+      console.log('Starting newsletter fetch...');
+      
       try {
         const response = await fetch('/api/newsletters');
-        if (!response.ok) throw new Error('Failed to fetch newsletters');
+        console.log('API Response:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error Response:', errorText);
+          throw new Error(`Failed to fetch newsletters: ${response.status} ${response.statusText}`);
+        }
+        
         const data = await response.json();
+        console.log('Newsletters received:', data);
+        
+        if (!Array.isArray(data)) {
+          console.error('Invalid data format:', data);
+          throw new Error('Invalid data format received from server');
+        }
+        
         setNewsletters(data);
       } catch (err: any) {
+        console.error('Newsletter fetch error:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -34,7 +50,6 @@ export default function NewslettersPage() {
         background: 'radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%)'
       }}
     >
-      <Header />
       <main className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold text-center mb-12 text-gray-900">Newsletter Archive</h1>
         
@@ -44,8 +59,12 @@ export default function NewslettersPage() {
           </div>
         ) : error ? (
           <div className="text-center text-red-500 py-12">
-            <p className="text-xl font-semibold mb-2">Oops! Something went wrong</p>
+            <p className="text-xl font-semibold mb-2">Error Loading Newsletters</p>
             <p className="text-gray-600">{error}</p>
+          </div>
+        ) : newsletters.length === 0 ? (
+          <div className="text-center text-gray-600 py-12">
+            <p>No newsletters found</p>
           </div>
         ) : (
           <NewsletterFeed newsletters={newsletters} />
