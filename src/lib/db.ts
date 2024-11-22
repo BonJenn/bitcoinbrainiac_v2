@@ -30,10 +30,11 @@ export async function connectToDatabase() {
     }
     
     const conn = await mongoose.connect(MONGODB_URI as string, {
-      directConnection: true,
       retryWrites: true,
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
+      maxPoolSize: 10,
+      minPoolSize: 5
     });
     
     console.log('Connected to database successfully');
