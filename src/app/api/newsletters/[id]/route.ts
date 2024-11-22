@@ -2,21 +2,14 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
-interface RouteParams {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
 export async function GET(
   request: Request,
-  { params }: RouteParams
+  context: { params: { id: string } }
 ) {
   try {
     await connectToDatabase();
     
-    const newsletter = await Newsletter.findOne({ id: params.id });
+    const newsletter = await Newsletter.findOne({ id: context.params.id });
     
     if (!newsletter) {
       return NextResponse.json(

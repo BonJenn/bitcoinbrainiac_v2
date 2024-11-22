@@ -42,6 +42,29 @@ async function createMailchimpCampaign(bitcoinPrice: number, content: string) {
   return campaign;
 }
 
+async function storeNewsletter(campaignId: string, content: string, bitcoinPrice: number) {
+  try {
+    console.log('Storing newsletter with price:', bitcoinPrice);
+    
+    const newsletter = new Newsletter({
+      id: new mongoose.Types.ObjectId().toString(),
+      title: 'Bitcoin Newsletter',
+      subtitle: 'Daily Bitcoin Market Update',
+      content,
+      sentAt: new Date(),
+      bitcoinPrice,
+      campaignId,
+      priceChange: 0
+    });
+    
+    const saved = await newsletter.save();
+    return saved;
+  } catch (error) {
+    console.error('Failed to store newsletter:', error);
+    throw error;
+  }
+}
+
 export async function GET(request: Request) {
   const context = 'Newsletter Generation';
   const metadata: any = {};
@@ -120,57 +143,5 @@ export async function GET(request: Request) {
     console.error('❌ Newsletter generation failed:', error);
     await logError(error, context, metadata);
     return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-async function logError(error: any, context: string) {
-  const errorLog = {
-    timestamp: new Date().toISOString(),
-    context,
-    error: {
-      message: error.message,
-      stack: error.stack,
-      name: error.name
-    },
-    environment: process.env.NODE_ENV,
-    service: 'newsletter-service'
-  };
-
-  console.error('Newsletter Error:', errorLog);
-
-  // Only attempt to send to logging service if URL is configured
-  if (process.env.ERROR_LOGGING_URL) {
-    try {
-      await fetch(process.env.ERROR_LOGGING_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(errorLog)
-      });
-    } catch (logError) {
-      console.error('Failed to log error:', logError);
-    }
-  }
-}
-
-async function storeNewsletter(campaignId: string, content: string, bitcoinPrice: number) {
-  try {
-    console.log('Storing newsletter with price:', bitcoinPrice);
-    
-    const newsletter = new Newsletter({
-      id: new mongoose.Types.ObjectId().toString(),
-      title: 'Bitcoin Newsletter',
-      subtitle: 'Daily Bitcoin Market Update',
-      content,
-      sentAt: new Date(),
-      bitcoinPrice,
-      campaignId,
-      priceChange: 0
-    });
-    
-    const saved = await newsletter.save();
-    return saved;
-  } catch (error) {
-    console.error('Failed to store newsletter:', error);
-    throw error;
   }
 }
