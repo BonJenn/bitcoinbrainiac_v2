@@ -1,11 +1,11 @@
-import { Server } from 'ws';
+import WebSocket from 'ws';
 import { NextApiResponse } from 'next';
 import { createServer } from 'http';
 
-let wss: Server;
+let wss: WebSocket.Server;
 
 export function initWebSocket(server: ReturnType<typeof createServer>) {
-  wss = new Server({ server });
+  wss = new WebSocket.Server({ server });
   
   wss.on('connection', (ws) => {
     console.log('Client connected to status WebSocket');
