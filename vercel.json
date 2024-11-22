@@ -4,7 +4,11 @@
     "schedule": "0 14 * * *"
   }],
   "functions": {
-    "src/app/api/newsletters/*.ts": {
+    "src/app/api/**/*.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    },
+    "src/lib/**/*.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
