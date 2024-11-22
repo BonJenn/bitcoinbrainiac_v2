@@ -84,8 +84,19 @@ export async function GET(request: Request) {
                 })}</p>
               </div>
               ${content
+                ?.replace('```html', '') // Remove any HTML markdown markers
+                ?.replace('```', '')     // Remove closing markdown markers
                 ?.split('\n\n')
                 .map(paragraph => {
+                  // Process headings
+                  if (paragraph.startsWith('<h3>')) {
+                    return paragraph;
+                  }
+                  // Process bullet points
+                  if (paragraph.includes('<ul>')) {
+                    return paragraph;
+                  }
+                  // Process regular paragraphs
                   const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                   return `<p style="margin: 0 0 15px; font-size: 16px; line-height: 1.8;">${boldText}</p>`;
                 })

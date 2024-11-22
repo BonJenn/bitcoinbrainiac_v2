@@ -52,10 +52,14 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     
     Style:
     - Professional and authoritative tone
-    - Data-driven analysis
+    - Data-driven analysis with specific numbers
+    - Each section should have:
+      * A strong opening paragraph (2-3 sentences)
+      * Relevant bullet points with specific data
+      * A concluding sentence tying points together
     - Clear section transitions
-    - 300-350 words total
-    - Emphasize institutional movements and their market impact
+    - 400-450 words total
+    - Balance between narrative paragraphs and bullet points
     
     Note: 
     - Ensure proper HTML formatting and spacing between sections
