@@ -50,8 +50,8 @@ async function fetchRSSFeed(source: { url: string, name: string }) {
       timestamp: new Date(item.pubDate[0]).toISOString(),
       fullText: `${item.title[0]} ${item.description[0].replace(/<[^>]*>/g, '')}`
     }));
-  } catch (error) {
-    console.error(`Failed to fetch from ${source.name}:`, error.message);
+  } catch (error: any) {
+    console.error(`Failed to fetch from ${source.name}:`, error?.message || 'Unknown error');
     return [];
   }
 }
