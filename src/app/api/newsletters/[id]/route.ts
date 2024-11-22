@@ -1,22 +1,15 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
-import { type NextRequest } from 'next/server';
-
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
 
 export async function GET(
-  _request: NextRequest,
-  context: RouteContext
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   try {
     await connectToDatabase();
     
-    const newsletter = await Newsletter.findOne({ id: context.params.id });
+    const newsletter = await Newsletter.findOne({ id: params.id });
     
     if (!newsletter) {
       return NextResponse.json(
