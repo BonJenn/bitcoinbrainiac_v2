@@ -7,7 +7,6 @@ import ErrorLog from './error-log';
 import { logError } from '@/lib/logger';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 import mongoose from 'mongoose';
-import { scheduleNewsletters } from '@/config/cron';
 
 export const runtime = 'nodejs';
 
@@ -174,9 +173,4 @@ async function storeNewsletter(campaignId: string, content: string, bitcoinPrice
     console.error('Failed to store newsletter:', error);
     throw error;
   }
-}
-
-// Initialize scheduling when the server starts
-if (process.env.NODE_ENV === 'production') {
-  scheduleNewsletters();
 }
