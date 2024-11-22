@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateNewsletter, generateTitle, generateSubtitle } from '@/lib/openai';
+import { generateNewsletter } from '@/lib/openai';
 import { getBitcoinPrice } from '@/lib/price';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
