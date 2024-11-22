@@ -4,20 +4,17 @@ import mongoose from 'mongoose';
 
 export async function GET() {
   try {
-    console.log('Testing database connection...');
-    console.log('Current connection state:', mongoose.connection.readyState);
-    
     await connectToDatabase();
     
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
       connectionState: mongoose.connection.readyState,
-      databaseName: mongoose.connection.db.databaseName
+      databaseName: mongoose.connection.db?.databaseName || 'Not connected'
     });
   } catch (error: any) {
     console.error('Connection test failed:', error);
     return NextResponse.json({ 
-      success: false,
+      success: false, 
       error: error.message 
     }, { 
       status: 500 
