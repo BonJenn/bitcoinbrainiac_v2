@@ -2,14 +2,19 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
+type Context = {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: Context
 ) {
   try {
     await connectToDatabase();
     
-    const newsletter = await Newsletter.findOne({ id: params.id });
+    const newsletter = await Newsletter.findOne({ id: context.params.id });
     
     if (!newsletter) {
       return NextResponse.json(
