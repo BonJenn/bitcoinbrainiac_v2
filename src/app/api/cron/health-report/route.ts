@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 import ErrorLog from '@/app/api/cron/newsletter/error-log';
-import { sendNotification } from '@/lib/notifications';
+import { sendNotification } from '@/lib/notifications/index.ts';
 
 export async function GET() {
   try {
