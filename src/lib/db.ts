@@ -29,7 +29,13 @@ export async function connectToDatabase() {
       return mongoose;
     }
     
-    const conn = await mongoose.connect(MONGODB_URI as string);
+    const conn = await mongoose.connect(MONGODB_URI as string, {
+      directConnection: true,
+      retryWrites: true,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    
     console.log('Connected to database successfully');
     console.log('Database name:', conn.connection.db?.databaseName);
     
