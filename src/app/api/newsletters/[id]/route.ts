@@ -1,18 +1,17 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
-import { NextRequest } from 'next/server';
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { id: string } }
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
-  console.log('Newsletter detail API hit for ID:', context.params.id);
+  console.log('Newsletter detail API hit for ID:', params.id);
   
   try {
     await connectToDatabase();
     
-    if (!context.params.id) {
+    if (!params.id) {
       console.log('Invalid newsletter ID provided');
       return NextResponse.json(
         { error: 'Invalid newsletter ID' },
@@ -22,13 +21,13 @@ export async function GET(
 
     const newsletter = await Newsletter.findOne({
       $or: [
-        { id: context.params.id },
-        { _id: context.params.id }
+        { id: params.id },
+        { _id: params.id }
       ]
     }).lean();
     
     if (!newsletter) {
-      console.log('Newsletter not found for ID:', context.params.id);
+      console.log('Newsletter not found for ID:', params.id);
       return NextResponse.json(
         { error: 'Newsletter not found' },
         { status: 404 }
