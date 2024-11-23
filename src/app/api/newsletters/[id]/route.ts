@@ -1,9 +1,21 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
+import type { Newsletter as NewsletterType } from '@/types/newsletter';
+import mongoose from 'mongoose';
+
+interface MongoNewsletter extends mongoose.Document {
+  _id: mongoose.Types.ObjectId;
+  id?: string;
+  title: string;
+  subtitle: string;
+  content: string;
+  sentAt: Date;
+  bitcoinPrice: number;
+  priceChange: number;
+}
 
 export async function GET(request: Request) {
-  // Extract ID from URL pattern
   const id = request.url.split('/').pop();
   console.log('Newsletter detail API hit for ID:', id);
   
@@ -23,7 +35,7 @@ export async function GET(request: Request) {
         { id },
         { _id: id }
       ]
-    }).lean();
+    }).lean() as MongoNewsletter;
     
     if (!newsletter) {
       console.log('Newsletter not found for ID:', id);
@@ -33,7 +45,7 @@ export async function GET(request: Request) {
       );
     }
     
-    const formattedNewsletter = {
+    const formattedNewsletter: NewsletterType = {
       id: newsletter.id || newsletter._id.toString(),
       title: newsletter.title,
       subtitle: newsletter.subtitle,
