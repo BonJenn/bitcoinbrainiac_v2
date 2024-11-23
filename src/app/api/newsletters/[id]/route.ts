@@ -1,12 +1,10 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { id } = params;
+export async function GET(request: Request) {
+  // Extract ID from URL pattern
+  const id = request.url.split('/').pop();
   console.log('Newsletter detail API hit for ID:', id);
   
   try {
