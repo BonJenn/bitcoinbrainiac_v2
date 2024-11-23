@@ -1,3 +1,5 @@
+import UnsubscribeForm from '@/components/UnsubscribeForm';
+
 export default function UnsubscribePage() {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
