@@ -2,9 +2,13 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
+type Params = {
+  id: string;
+};
+
 export async function GET(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Params }
 ) {
   console.log('Newsletter detail API hit for ID:', params.id);
   
