@@ -13,7 +13,7 @@ export default function Footer() {
               <h3 className="font-bold text-lg mb-4">Quick Links</h3>
               <ul className="space-y-2 text-gray-400">
                 <li><a href="/" className="hover:text-white transition-colors">Home</a></li>
-                <li><a href="/dashboard" className="hover:text-white transition-colors">Unsubscribe</a></li>
+                <li><a href="/unsubscribe" className="hover:text-white transition-colors">Unsubscribe</a></li>
               </ul>
             </div>
             <div>
