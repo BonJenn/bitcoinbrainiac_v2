@@ -2,13 +2,9 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
-type Props = {
-  params: { id: string }
-}
-
 export async function GET(
-  _request: Request,
-  { params }: Props
+  request: Request,
+  { params }: { params: { id: string } }
 ) {
   console.log('Newsletter detail API hit for ID:', params.id);
   
