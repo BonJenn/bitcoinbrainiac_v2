@@ -4,7 +4,7 @@ import Newsletter from '@/models/Newsletter';
 
 export async function GET(
   request: Request,
-  { params }: { params: Record<string, string> }
+  { params }: { params: { id: string } }
 ) {
   console.log('Newsletter detail API hit for ID:', params.id);
   
