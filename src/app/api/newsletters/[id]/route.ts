@@ -2,17 +2,11 @@ import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
 
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
 export async function GET(
   _request: Request,
-  { params }: RouteContext
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
   console.log('Newsletter detail API hit for ID:', id);
   
   try {
