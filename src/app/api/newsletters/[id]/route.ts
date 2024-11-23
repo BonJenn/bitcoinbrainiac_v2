@@ -4,8 +4,8 @@ import Newsletter from '@/models/Newsletter';
 import type { Newsletter as NewsletterType } from '@/types/newsletter';
 import mongoose from 'mongoose';
 
-interface MongoNewsletter extends mongoose.Document {
-  _id: mongoose.Types.ObjectId;
+interface MongoNewsletter {
+  _id: mongoose.Types.ObjectId | string;
   id?: string;
   title: string;
   subtitle: string;
@@ -13,6 +13,7 @@ interface MongoNewsletter extends mongoose.Document {
   sentAt: Date;
   bitcoinPrice: number;
   priceChange: number;
+  __v?: number;
 }
 
 export async function GET(request: Request) {
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
         { id },
         { _id: id }
       ]
-    }).lean() as MongoNewsletter;
+    }).lean().exec() as unknown as MongoNewsletter;
     
     if (!newsletter) {
       console.log('Newsletter not found for ID:', id);
