@@ -8,14 +8,43 @@ interface Props {
 
 export default function NewsletterFeed({ newsletters }: Props) {
   const [selectedNewsletter, setSelectedNewsletter] = useState<Newsletter | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleNewsletterClick = async (newsletter: Newsletter) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch(`/api/newsletters/${newsletter.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch newsletter');
+      }
+      const fullNewsletter = await response.json();
+      setSelectedNewsletter(fullNewsletter);
+    } catch (err) {
+      setError('Failed to load newsletter');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-      {selectedNewsletter ? (
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : error ? (
+        <div className="text-center text-red-500 py-12">
+          <p>{error}</p>
+        </div>
+      ) : selectedNewsletter ? (
         <div className="mb-8">
           <button 
             onClick={() => setSelectedNewsletter(null)}
-            className="mb-6 text-blue-500 hover:text-blue-700 flex items-center gap-2"
+            className="mb-6 text-blue-500 hover:text-blue-700 flex items-center gap-2 transition-colors duration-200"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -25,27 +54,43 @@ export default function NewsletterFeed({ newsletters }: Props) {
           <NewsletterView newsletter={selectedNewsletter} />
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="grid grid-cols-1 gap-6">
           {newsletters.map((newsletter) => (
             <div 
               key={newsletter.id}
-              onClick={() => setSelectedNewsletter(newsletter)}
-              className="cursor-pointer border-b border-gray-100 pb-6 hover:bg-gray-50/50 p-6 rounded-xl transition-all duration-200 ease-in-out"
-              style={{
-                background: 'linear-gradient(to right, rgba(255,255,255,0.8), rgba(255,243,214,0.3))'
-              }}
+              onClick={() => handleNewsletterClick(newsletter)}
+              className="group cursor-pointer rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
             >
-              <h2 className="text-2xl font-bold mb-2 text-gray-900">{newsletter.title}</h2>
-              <h3 className="text-lg text-gray-700 mb-3">{newsletter.subtitle}</h3>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>{new Date(newsletter.sentAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}</span>
-                <span className={newsletter.priceChange >= 0 ? 'text-green-600' : 'text-red-600'}>
-                  Bitcoin: ${newsletter.bitcoinPrice.toLocaleString()}
-                </span>
+              <div 
+                className="p-6 relative bg-gradient-to-br from-[#f6d365] to-[#fda085] group-hover:bg-white transition-all duration-300"
+              >
+                <div className="relative z-10">
+                  <h2 className="text-2xl font-bold mb-2 text-gray-900">
+                    {newsletter.title}
+                  </h2>
+                  <h3 className="text-lg text-gray-800 mb-4 opacity-90">
+                    {newsletter.subtitle}
+                  </h3>
+                  <div className="flex items-center gap-6 text-sm">
+                    <span className="bg-white/30 px-3 py-1 rounded-full text-gray-800 group-hover:bg-gray-100">
+                      {new Date(newsletter.sentAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full ${
+                      newsletter.priceChange >= 0 
+                        ? 'bg-green-500/20 text-green-800' 
+                        : 'bg-red-500/20 text-red-800'
+                    }`}>
+                      Bitcoin: ${newsletter.bitcoinPrice.toLocaleString()}
+                      <span className="ml-1">
+                        ({newsletter.priceChange >= 0 ? '+' : ''}{newsletter.priceChange}%)
+                      </span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

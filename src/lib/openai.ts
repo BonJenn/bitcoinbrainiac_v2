@@ -12,7 +12,8 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     Create a well-structured Bitcoin market update with clear sections.
     
     Format Requirements:
-    - Use HTML formatting for structure
+    - Start the content directly with the first section (no HTML tags at the start)
+    - Use HTML formatting only for styling within sections
     - Each section should have an <h3> heading
     - Use <p> tags for paragraphs
     - Use <strong> for bold text
@@ -53,18 +54,15 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     Style:
     - Professional and authoritative tone
     - Data-driven analysis with specific numbers
-    - Each section should have:
-      * A strong opening paragraph (2-3 sentences)
-      * Relevant bullet points with specific data
-      * A concluding sentence tying points together
+    - Each section should start directly with the heading text (no HTML prefix)
     - Clear section transitions
     - 400-450 words total
     - Balance between narrative paragraphs and bullet points
     
     Note: 
-    - Ensure proper HTML formatting and spacing between sections
-    - Include specific numbers and data points where possible
-    - Highlight institutional flows and their market impact
+    - Do not include any HTML prefix before the first section
+    - Start directly with "Market Overview" as the first line
+    - Ensure proper HTML formatting within sections only
   `;
 
   const completion = await openai.chat.completions.create({

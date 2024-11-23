@@ -15,7 +15,11 @@ export async function GET() {
     const newsletters = await Newsletter.find()
       .sort({ sentAt: -1 })
       .limit(50)
-      .lean();
+      .lean()
+      .then(docs => docs.map(doc => ({
+        ...doc,
+        id: doc.id || doc._id.toString()
+      })));
     
     console.log(`Found ${newsletters.length} newsletters`);
     if (newsletters.length > 0) {
