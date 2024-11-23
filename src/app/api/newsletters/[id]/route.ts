@@ -4,9 +4,9 @@ import Newsletter from '@/models/Newsletter';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = context.params;
   console.log('Newsletter detail API hit for ID:', id);
   
   try {
