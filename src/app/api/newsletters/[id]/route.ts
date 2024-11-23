@@ -26,8 +26,6 @@ export async function GET(
       ]
     }).lean();
     
-    console.log('Found newsletter:', newsletter);
-    
     if (!newsletter) {
       console.log('Newsletter not found for ID:', params.id);
       return NextResponse.json(
@@ -46,7 +44,6 @@ export async function GET(
       priceChange: newsletter.priceChange
     };
     
-    console.log('Newsletter found:', formattedNewsletter.id);
     return NextResponse.json(formattedNewsletter);
   } catch (error: any) {
     console.error('Error fetching newsletter:', error);
