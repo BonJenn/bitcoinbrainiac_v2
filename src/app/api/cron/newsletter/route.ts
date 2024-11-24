@@ -23,7 +23,7 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
     currency: 'USD'
   });
 
-  const title = `${mainStory.headline} - Today's Price: ${formattedPrice}`;
+  const title = `${mainStory.headline} | BTC: ${formattedPrice}`;
   console.log('Creating campaign with title:', title);
   
   const campaign = await mailchimp.campaigns.create({
@@ -73,13 +73,10 @@ function findMainStory(articles: any[]) {
       let headline = article.title
         .replace(/^Breaking:?\s*/i, '')
         .replace(/^Just In:?\s*/i, '')
-        .replace(/^Report:?\s*/i, '')
-        .split(' ')
-        .slice(0, 5)
-        .join(' ');
+        .replace(/^Report:?\s*/i, '');
       
-      if (headline.length < article.title.length) {
-        headline += '...';
+      if (headline.length > 40) {
+        headline = headline.substring(0, 40).split(' ').slice(0, -1).join(' ');
       }
 
       mainStory = {
