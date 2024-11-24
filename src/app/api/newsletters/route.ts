@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import { connectToDatabase } from '@/lib/db';
 import Newsletter from '@/models/Newsletter';
+import mongoose from 'mongoose';
+
+type MongoDoc = {
+  _id: mongoose.Types.ObjectId;
+  id?: string;
+  title: string;
+  subtitle: string;
+  content: string;
+  sentAt: Date;
+  bitcoinPrice: number;
+  priceChange: number;
+}
 
 export async function GET() {
   console.log('Newsletter list API endpoint hit');
@@ -16,7 +28,7 @@ export async function GET() {
       .sort({ sentAt: -1 })
       .limit(50)
       .lean()
-      .then(docs => docs.map(doc => ({
+      .then(docs => (docs as MongoDoc[]).map(doc => ({
         ...doc,
         id: doc.id || doc._id.toString()
       })));
