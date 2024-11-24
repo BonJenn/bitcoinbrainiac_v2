@@ -8,18 +8,32 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
   const priceColor = bitcoinData.change24h >= 0 ? 'green' : 'red';
   const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
   
+  const formattedArticles = articles.map(article => ({
+    ...article,
+    imageHtml: article.imageUrl ? 
+      `<div style="margin: 20px 0;">
+        <img src="${article.imageUrl}" alt="${article.title}" style="max-width: 100%; height: auto; border-radius: 8px;">
+        <p style="color: #666; font-size: 0.9em; margin-top: 8px;">Source: ${article.imageSource}</p>
+      </div>` : ''
+  }));
+
   const prompt = `
-    Create a well-structured Bitcoin market update with clear sections.
+    Create a well-structured Bitcoin market update with clear sections in the voice of Scott Galloway.
+    Include relevant images from the articles where they fit naturally in the content.
     
     Format Requirements:
-    - Start the content directly with the first section (no HTML tags at the start)
-    - Use HTML formatting only for styling within sections
-    - Each section should have an <h3> heading
-    - Use <p> tags for paragraphs
-    - Use <strong> for bold text
-    - Add line breaks between sections
-    - First sentence of each section should be bold
-    - Include bullet points where relevant using <ul> and <li>
+    - Wrap the entire content in a div with these styles:
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+    - Each section heading should use:
+      <h3 style="color: #1a1a1a; border-bottom: 2px solid #f7931a; padding-bottom: 8px; margin-top: 25px;">
+    - Paragraphs should use:
+      <p style="color: #333; margin: 16px 0;">
+    - Lists should use:
+      <ul style="margin: 16px 0; padding-left: 20px;">
+      <li style="margin: 8px 0; color: #333;">
+    - Price changes should be colored:
+      Positive: <span style="color: #28a745;">
+      Negative: <span style="color: #dc3545;">
     
     Required Sections:
     1. Market Overview
@@ -59,6 +73,11 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
     - 400-450 words total
     - Balance between narrative paragraphs and bullet points
     
+    Images:
+    - Insert the provided imageHtml where relevant to the content
+    - Place images after their related paragraphs
+    - Maximum 3 images in the newsletter
+    
     Note: 
     - Do not include any HTML prefix before the first section
     - Start directly with "Market Overview" as the first line
@@ -74,7 +93,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
       },
       {
         role: "user",
-        content: prompt + "\n\nArticles:\n" + JSON.stringify(articles, null, 2)
+        content: prompt + "\n\nArticles:\n" + JSON.stringify(formattedArticles, null, 2)
       }
     ],
   });

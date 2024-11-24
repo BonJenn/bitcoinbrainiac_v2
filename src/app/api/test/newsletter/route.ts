@@ -45,7 +45,7 @@ export async function GET(request: Request) {
         },
         settings: {
           subject_line: `[TEST] Bitcoin Daily: BTC at $${bitcoinData.price.toLocaleString()}`,
-          preview_text: 'Test email - New format with larger text',
+          preview_text: 'Test email - Daily Bitcoin Update',
           title: `Test Newsletter - ${new Date().toLocaleDateString()}`,
           from_name: 'Bitcoin Brainiac',
           reply_to: process.env.MAILCHIMP_REPLY_TO,
@@ -67,46 +67,7 @@ export async function GET(request: Request) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="font-family: Arial, sans-serif; line-height: 1.8; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
-              <div style="border-bottom: 2px solid #ffa500; margin-bottom: 20px; padding-bottom: 20px;">
-                <h1 style="color: #1a1a1a; font-size: 28px; margin: 0;">Bitcoin Daily Update</h1>
-                <p style="color: #666; font-size: 16px; margin: 5px 0 0;">${new Date().toLocaleDateString('en-US', { 
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}</p>
-              </div>
-              ${content
-                ?.replace('```html', '') // Remove any HTML markdown markers
-                ?.replace('```', '')     // Remove closing markdown markers
-                ?.split('\n\n')
-                .map(paragraph => {
-                  // Process headings
-                  if (paragraph.startsWith('<h3>')) {
-                    return paragraph;
-                  }
-                  // Process bullet points
-                  if (paragraph.includes('<ul>')) {
-                    return paragraph;
-                  }
-                  // Process regular paragraphs
-                  const boldText = paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                  return `<p style="margin: 0 0 15px; font-size: 16px; line-height: 1.8;">${boldText}</p>`;
-                })
-                .join('') || ''}
-              <div style="border-top: 2px solid #ffa500; margin-top: 20px; padding-top: 20px; font-size: 14px; color: #666;">
-                <p>Have thoughts about Bitcoin? Just hit reply!</p>
-              </div>
-            </body>
-          </html>
-        `
+        html: content
       }),
     });
 
@@ -126,8 +87,7 @@ export async function GET(request: Request) {
     console.error('Newsletter test failed:', error);
     return NextResponse.json({ 
       error: 'Failed to send test newsletter',
-      details: error.message,
-      stack: error.stack
+      details: error.message
     }, { 
       status: 500 
     });

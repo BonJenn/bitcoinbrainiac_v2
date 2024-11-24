@@ -43,17 +43,32 @@ async function fetchRSSFeed(source: { url: string, name: string }) {
     const result = await parseStringPromise(response.data);
     const items = result.rss.channel[0].item;
     
-    return items.map((item: any) => ({
-      title: item.title[0],
-      summary: item.description[0].replace(/<[^>]*>/g, ''),
-      source: source.name,
-      timestamp: new Date(item.pubDate[0]).toISOString(),
-      fullText: `${item.title[0]} ${item.description[0].replace(/<[^>]*>/g, '')}`
-    }));
+    return items.map((item: any) => {
+      const image = 
+        item['media:content']?.[0]?.$.url ||
+        item['media:thumbnail']?.[0]?.$.url ||
+        item.enclosure?.[0]?.$.url ||
+        extractImageFromDescription(item.description[0]);
+
+      return {
+        title: item.title[0],
+        summary: item.description[0].replace(/<[^>]*>/g, ''),
+        source: source.name,
+        timestamp: new Date(item.pubDate[0]).toISOString(),
+        fullText: `${item.title[0]} ${item.description[0].replace(/<[^>]*>/g, '')}`,
+        imageUrl: image,
+        imageSource: source.name
+      };
+    });
   } catch (error: any) {
     console.error(`Failed to fetch from ${source.name}:`, error?.message || 'Unknown error');
     return [];
   }
+}
+
+function extractImageFromDescription(description: string): string | null {
+  const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
+  return imgMatch ? imgMatch[1] : null;
 }
 
 export async function scrapeBitcoinNews() {
