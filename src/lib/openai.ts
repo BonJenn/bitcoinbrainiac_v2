@@ -46,13 +46,13 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
     
     Format Requirements:
     - Wrap the entire content in a div with these styles:
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6;">
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; line-height: 1.6; font-size: 16px;">
     - Each section heading should use:
-      <h3 style="color: #1a1a1a; border-bottom: 2px solid #f7931a; padding-bottom: 8px; margin-top: 25px;">
+      <h3 style="color: #1a1a1a; border-bottom: 2px solid #f7931a; padding-bottom: 8px; margin-top: 25px; font-size: 20px;">
     - Paragraphs should use:
-      <p style="color: #333; margin: 16px 0;">
+      <p style="color: #333; margin: 16px 0; font-size: 16px;">
     - Lists should use:
-      <ul style="margin: 16px 0; padding-left: 20px;">
+      <ul style="margin: 16px 0; padding-left: 20px; font-size: 16px;">
       <li style="margin: 8px 0; color: #333;">
     - Price changes should be colored:
       Positive: <span style="color: #28a745;">
