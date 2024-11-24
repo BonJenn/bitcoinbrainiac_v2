@@ -10,19 +10,20 @@ import mongoose from 'mongoose';
 
 export const runtime = 'nodejs';
 
-async function createMailchimpCampaign(bitcoinPrice: number, content: string) {
+export async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
   console.log('Setting up Mailchimp with price:', bitcoinPrice);
   mailchimp.setConfig({
     apiKey: process.env.MAILCHIMP_API_KEY,
     server: process.env.MAILCHIMP_SERVER_PREFIX,
   });
 
+  const mainStory = findMainStory(articles);
   const formattedPrice = Number(bitcoinPrice).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD'
   });
 
-  const title = `Bitcoin Update: ${formattedPrice}`;
+  const title = `${mainStory.headline} - Today's Price: ${formattedPrice}`;
   console.log('Creating campaign with title:', title);
   
   const campaign = await mailchimp.campaigns.create({
@@ -40,6 +41,55 @@ async function createMailchimpCampaign(bitcoinPrice: number, content: string) {
   await mailchimp.campaigns.send(campaign.id);
 
   return campaign;
+}
+
+function findMainStory(articles: any[]) {
+  const priorityKeywords = [
+    'etf', 'sec', 'federal', 'halving', 
+    'record', 'crash', 'major', 'breaking', 'all-time high', 
+    'all-time low', 'record high', 'record low',  'all-time highs'
+  ];
+  
+  let topScore = 0;
+  let mainStory = {
+    headline: 'Bitcoin Daily Update',
+    score: 0
+  };
+
+  articles.forEach((article, index) => {
+    let score = (articles.length - index) * 10;
+    
+    priorityKeywords.forEach(keyword => {
+      if (article.title.toLowerCase().includes(keyword)) {
+        score += 20;
+      }
+      if (article.summary.toLowerCase().includes(keyword)) {
+        score += 10;
+      }
+    });
+
+    if (score > topScore) {
+      topScore = score;
+      let headline = article.title
+        .replace(/^Breaking:?\s*/i, '')
+        .replace(/^Just In:?\s*/i, '')
+        .replace(/^Report:?\s*/i, '')
+        .split(' ')
+        .slice(0, 5)
+        .join(' ');
+      
+      if (headline.length < article.title.length) {
+        headline += '...';
+      }
+
+      mainStory = {
+        headline,
+        score
+      };
+    }
+  });
+
+  return mainStory;
 }
 
 async function storeNewsletter(campaignId: string, content: string, bitcoinPrice: number) {
@@ -120,7 +170,7 @@ export async function GET(request: Request) {
     }
 
     // Create and send campaign
-    const campaign = await createMailchimpCampaign(bitcoinData.price, newsletterContent);
+    const campaign = await createMailchimpCampaign(bitcoinData.price, newsletterContent, data.articles);
     metadata.campaignId = campaign.id;
     
     // Before storing newsletter

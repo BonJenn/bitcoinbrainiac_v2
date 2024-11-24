@@ -4,6 +4,7 @@ import Newsletter from '@/models/Newsletter';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 import mongoose from 'mongoose';
 import { fetchArticles, fetchBitcoinData } from '@/lib/data';
+import { createMailchimpCampaign } from '@/app/api/cron/newsletter/route';
 
 export async function sendNewsletter() {
   console.log('📨 Starting sendNewsletter function');
@@ -32,7 +33,7 @@ export async function sendNewsletter() {
     
     console.log('Newsletter content generated');
 
-    // Create Mailchimp campaign
+    // Create Mailchimp campaign with articles for headline generation
     console.log('Setting up Mailchimp...');
     mailchimp.setConfig({
       apiKey: process.env.MAILCHIMP_API_KEY,
@@ -40,20 +41,7 @@ export async function sendNewsletter() {
     });
 
     console.log('Creating Mailchimp campaign...');
-    const campaign = await mailchimp.campaigns.create({
-      type: 'regular',
-      recipients: { list_id: process.env.MAILCHIMP_LIST_ID },
-      settings: {
-        subject_line: 'Your Bitcoin Newsletter',
-        title: 'Bitcoin Newsletter',
-        from_name: 'Bitcoin Brainiac',
-        reply_to: process.env.MAILCHIMP_REPLY_TO,
-      },
-    });
-
-    // Set campaign content and send
-    await mailchimp.campaigns.setContent(campaign.id, { html: content });
-    await mailchimp.campaigns.send(campaign.id);
+    const campaign = await createMailchimpCampaign(bitcoinData.price, content, articles);
 
     // Save to database
     const newsletter = new Newsletter({

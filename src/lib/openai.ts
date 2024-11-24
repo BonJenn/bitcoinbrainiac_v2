@@ -4,7 +4,14 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function generateNewsletter(articles: any[], bitcoinData: { price: number, change24h: number }) {
+export async function generateNewsletter(articles: any[], bitcoinData: { 
+  price: number, 
+  change24h: number,
+  fearGreedIndex: {
+    value: number,
+    classification: string
+  }
+}) {
   const priceColor = bitcoinData.change24h >= 0 ? 'green' : 'red';
   const formattedPrice = `<span style="color: ${priceColor}; font-weight: bold">$${bitcoinData.price.toLocaleString()}</span> <span style="color: ${priceColor}; font-weight: bold">(${bitcoinData.change24h.toFixed(2)}%)</span>`;
   
@@ -17,8 +24,24 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
       </div>` : ''
   }));
 
+  const fearGreedColor = bitcoinData.fearGreedIndex.classification.toLowerCase().includes('fear') ? 'dc3545' : '28a745';
+  const fearGreedChartUrl = 'https://alternative.me/crypto/fear-and-greed-index.png';
+  
+  const fearGreedHtml = `
+    <div style="margin: 20px 0;">
+      <img src="${fearGreedChartUrl}" alt="Bitcoin Fear and Greed Index" style="max-width: 100%; height: auto; border-radius: 8px;">
+      <p style="color: #666; font-size: 0.9em; margin-top: 8px;">
+        Current Fear & Greed Index: 
+        <span style="color: #${fearGreedColor}; font-weight: bold">
+          ${bitcoinData.fearGreedIndex.value} (${bitcoinData.fearGreedIndex.classification})
+        </span>
+      </p>
+    </div>
+  `;
+
   const prompt = `
     Create a well-structured Bitcoin market update with clear sections in the voice of Scott Galloway.
+    Focus exclusively on Bitcoin - do not include any NFT-related content or any other crypto-assets.
     Include relevant images from the articles where they fit naturally in the content.
     
     Format Requirements:
@@ -56,6 +79,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: { price: 
        - Volume analysis
     
     5. Market Sentiment
+       ${fearGreedHtml}
        - Institutional activity
        - Trading volume patterns
        - Derivatives market overview
