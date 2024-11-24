@@ -161,7 +161,8 @@ export async function GET(request: Request) {
     // Generate newsletter
     const newsletterContent = await generateNewsletter(data.articles, {
       price: Number(bitcoinData.price),
-      change24h: Number(bitcoinData.change24h)
+      change24h: Number(bitcoinData.change24h),
+      fearGreedIndex: bitcoinData.fearGreedIndex
     });
     metadata.contentGenerated = !!newsletterContent;
     

@@ -21,7 +21,11 @@ export async function GET(request: Request) {
     }
 
     console.log('Generating newsletter content...');
-    const content = await generateNewsletter(articles, bitcoinData);
+    const content = await generateNewsletter(articles, {
+      price: Number(bitcoinData.price),
+      change24h: Number(bitcoinData.change24h),
+      fearGreedIndex: bitcoinData.fearGreedIndex
+    });
     
     if (!content) throw new Error('Failed to generate newsletter content');
 
