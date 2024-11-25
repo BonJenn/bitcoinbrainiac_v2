@@ -26,8 +26,8 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
     server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0],
   });
 
-  const priceChange = bitcoinPrice >= 0 ? `+${bitcoinPrice}%` : `${bitcoinPrice}%`;
-  const subject = `Bitcoin ${priceChange}: ${articles[0].title}`;
+  const formattedPrice = `$${bitcoinPrice.toLocaleString()}`;
+  const subject = `${articles[0].title} | BTC Price: ${formattedPrice}`;
 
   const campaign = await mailchimp.campaigns.create({
     type: 'regular',
