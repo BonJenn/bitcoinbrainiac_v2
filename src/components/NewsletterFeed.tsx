@@ -153,7 +153,7 @@ export default function NewsletterFeed({ newsletters: initialNewsletters }: Prop
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <h4 className="font-medium">{newsletter.title}</h4>
+                              <h4 className="font-medium">{newsletter.subject || newsletter.title}</h4>
                               <p className="text-sm text-gray-600">
                                 {new Date(newsletter.sentAt).toLocaleDateString('en-US', {
                                   weekday: 'long',

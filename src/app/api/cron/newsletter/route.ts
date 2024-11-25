@@ -11,36 +11,56 @@ import mongoose from 'mongoose';
 export const runtime = 'nodejs';
 
 export async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
-  console.log('Setting up Mailchimp with price:', bitcoinPrice);
+  if (!content) {
+    throw new Error('Newsletter content is required');
+  }
+
+  // Configure Mailchimp with correct server format
   mailchimp.setConfig({
     apiKey: process.env.MAILCHIMP_API_KEY,
-    server: process.env.MAILCHIMP_SERVER_PREFIX,
+    server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0], // Extract server prefix without the '-us10' part
   });
 
-  const mainStory = findMainStory(articles);
-  const formattedPrice = Number(bitcoinPrice).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD'
+  console.log('Mailchimp Configuration:', {
+    hasApiKey: !!process.env.MAILCHIMP_API_KEY,
+    server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0],
   });
 
-  const title = `${mainStory.headline} | BTC: ${formattedPrice}`;
-  console.log('Creating campaign with title:', title);
-  
+  const priceChange = bitcoinPrice >= 0 ? `+${bitcoinPrice}%` : `${bitcoinPrice}%`;
+  const subject = `Bitcoin ${priceChange}: ${articles[0].title}`;
+
   const campaign = await mailchimp.campaigns.create({
     type: 'regular',
-    recipients: { list_id: process.env.MAILCHIMP_LIST_ID },
     settings: {
-      subject_line: title,
-      title,
+      subject_line: subject,
+      preview_text: `Bitcoin is trading at $${bitcoinPrice.toLocaleString()}`,
+      title: subject,
       from_name: 'Bitcoin Brainiac',
-      reply_to: process.env.MAILCHIMP_REPLY_TO,
+      reply_to: 'news@bitcoinbrainiac.com',
+      template_id: process.env.MAILCHIMP_TEMPLATE_ID
     },
+    recipients: {
+      list_id: process.env.MAILCHIMP_LIST_ID as string
+    }
   });
 
-  await mailchimp.campaigns.setContent(campaign.id, { html: content });
-  await mailchimp.campaigns.send(campaign.id);
+  try {
+    const contentResponse = await mailchimp.campaigns.setContent(campaign.id, {
+      html: content
+    });
 
-  return campaign;
+    if (!contentResponse) {
+      // If content setting fails, delete the campaign to avoid empty drafts
+      await mailchimp.campaigns.delete(campaign.id);
+      throw new Error('Failed to set campaign content');
+    }
+
+    return campaign;
+  } catch (error) {
+    // Clean up the campaign if content setting fails
+    await mailchimp.campaigns.delete(campaign.id).catch(console.error);
+    throw error;
+  }
 }
 
 function findMainStory(articles: any[]) {

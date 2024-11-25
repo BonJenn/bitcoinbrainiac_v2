@@ -34,10 +34,14 @@ export async function sendNewsletter() {
     console.log('Newsletter content generated');
 
     // Create Mailchimp campaign with articles for headline generation
-    console.log('Setting up Mailchimp...');
+    console.log('Setting up Mailchimp...', {
+      server: `${process.env.MAILCHIMP_SERVER_PREFIX}.api`,
+      hasApiKey: !!process.env.MAILCHIMP_API_KEY
+    });
+
     mailchimp.setConfig({
       apiKey: process.env.MAILCHIMP_API_KEY,
-      server: process.env.MAILCHIMP_SERVER_PREFIX,
+      server: `${process.env.MAILCHIMP_SERVER_PREFIX}.api`,
     });
 
     console.log('Creating Mailchimp campaign...');
@@ -46,8 +50,8 @@ export async function sendNewsletter() {
     // Save to database
     const newsletter = new Newsletter({
       id: new mongoose.Types.ObjectId().toString(),
-      title: 'Bitcoin Newsletter',
-      subtitle: 'Daily Bitcoin Market Update',
+      title: campaign.settings.subject_line,
+      subtitle: campaign.settings.preview_text || 'Daily Bitcoin Market Update',
       content,
       sentAt: new Date(),
       bitcoinPrice: bitcoinData.price,
