@@ -6,4 +6,5 @@ export interface Newsletter {
     sentAt: Date;
     bitcoinPrice: number;
     priceChange: number;
+    subject?: string;
   }
