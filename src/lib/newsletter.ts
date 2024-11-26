@@ -56,7 +56,8 @@ export async function sendNewsletter() {
       sentAt: new Date(),
       bitcoinPrice: bitcoinData.price,
       priceChange: bitcoinData.change24h,
-      campaignId: campaign.id
+      campaignId: campaign.id,
+      fearGreedIndex: bitcoinData.fearGreedIndex
     });
     
     const saved = await newsletter.save();
