@@ -107,9 +107,9 @@ export default function NewsletterFeed({ newsletters: initialNewsletters }: Prop
         <div key={year} className="border rounded-lg overflow-hidden">
           <button
             onClick={() => toggleSection(`year-${year}`)}
-            className="w-full px-6 py-4 bg-gray-100 hover:bg-gray-200 flex justify-between items-center"
+            className="w-full px-6 py-4 bg-gradient-to-br from-[#ffe4bc] to-[#ffc49d] hover:from-[#ffd6a0] hover:to-[#ffb183] flex justify-between items-center"
           >
-            <h2 className="text-xl font-semibold">{year}</h2>
+            <h2 className="text-xl font-semibold text-gray-900">{year}</h2>
             <svg
               className={`w-6 h-6 transform transition-transform ${
                 expandedSections[`year-${year}`] ? 'rotate-180' : ''
@@ -125,12 +125,12 @@ export default function NewsletterFeed({ newsletters: initialNewsletters }: Prop
           {expandedSections[`year-${year}`] && (
             <div className="space-y-2 p-4">
               {Object.entries(months).reverse().map(([month, monthNewsletters]) => (
-                <div key={`${year}-${month}`} className="border rounded-lg">
+                <div key={`${year}-${month}`} className="border rounded-lg overflow-hidden">
                   <button
                     onClick={() => toggleSection(`${year}-${month}`)}
-                    className="w-full px-4 py-3 bg-gray-50 hover:bg-gray-100 flex justify-between items-center"
+                    className="w-full px-4 py-3 bg-gradient-to-br from-[#ffe4bc] to-[#ffc49d] hover:from-[#ffd6a0] hover:to-[#ffb183] flex justify-between items-center opacity-90"
                   >
-                    <h3 className="text-lg font-medium">{month}</h3>
+                    <h3 className="text-lg font-medium text-gray-900">{month}</h3>
                     <svg
                       className={`w-5 h-5 transform transition-transform ${
                         expandedSections[`${year}-${month}`] ? 'rotate-180' : ''
@@ -142,19 +142,19 @@ export default function NewsletterFeed({ newsletters: initialNewsletters }: Prop
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
-                  
+
                   {expandedSections[`${year}-${month}`] && (
                     <div className="divide-y">
                       {monthNewsletters.map((newsletter) => (
                         <div
                           key={newsletter.id}
                           onClick={() => handleNewsletterClick(newsletter)}
-                          className="p-4 hover:bg-gray-50 cursor-pointer"
+                          className="p-4 bg-gradient-to-br from-[#ffe4bc] to-[#ffc49d] hover:from-[#ffd6a0] hover:to-[#ffb183] cursor-pointer opacity-80 hover:opacity-100 transition-all duration-200"
                         >
                           <div className="flex justify-between items-start">
                             <div>
-                              <h4 className="font-medium">{newsletter.subject || newsletter.title}</h4>
-                              <p className="text-sm text-gray-600">
+                              <h4 className="font-medium text-gray-900">{newsletter.subject || newsletter.title}</h4>
+                              <p className="text-sm text-gray-700">
                                 {new Date(newsletter.sentAt).toLocaleDateString('en-US', {
                                   weekday: 'long',
                                   month: 'long',

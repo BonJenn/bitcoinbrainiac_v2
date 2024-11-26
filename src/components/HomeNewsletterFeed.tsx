@@ -30,6 +30,14 @@ export default function HomeNewsletterFeed({ newsletters }: Props) {
           </Link>
         ))}
       </div>
+      <div className="mt-8 text-center">
+        <Link
+          href="/newsletters"
+          className="inline-block px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-semibold rounded-lg hover:from-orange-600 hover:to-amber-600 transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          View All Newsletters
+        </Link>
+      </div>
     </div>
   );
 }

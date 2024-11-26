@@ -8,8 +8,7 @@ export async function GET() {
     await connectToDatabase();
     
     const docs = await Newsletter.find()
-      .sort({ sentAt: -1 })
-      .limit(50);
+      .sort({ sentAt: -1 });
     
     const newsletters = docs.map(doc => ({
       id: doc.id || doc._id.toString(),
