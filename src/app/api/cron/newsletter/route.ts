@@ -60,7 +60,7 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
       schedule_time: '2023-10-10T14:00:00Z' // 6:00 AM PST in UTC
     });
 
-    return campaign;
+    return campaign
   } catch (error) {
     // Clean up the campaign if content setting fails
     await mailchimp.campaigns.delete(campaign.id).catch(console.error);
