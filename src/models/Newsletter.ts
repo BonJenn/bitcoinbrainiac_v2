@@ -8,7 +8,11 @@ const newsletterSchema = new mongoose.Schema({
   sentAt: { type: Date, required: true },
   bitcoinPrice: { type: Number, required: true },
   priceChange: { type: Number, required: true },
-  campaignId: { type: String }
+  campaignId: { type: String },
+  fearGreedIndex: {
+    value: { type: Number, required: true },
+    classification: { type: String, required: true }
+  }
 }, {
   timestamps: true
 });

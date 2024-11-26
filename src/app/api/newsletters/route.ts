@@ -17,7 +17,12 @@ export async function GET() {
       content: doc.content,
       sentAt: doc.sentAt,
       bitcoinPrice: doc.bitcoinPrice,
-      priceChange: doc.priceChange
+      priceChange: doc.priceChange,
+      campaignId: doc.campaignId,
+      fearGreedIndex: doc.fearGreedIndex || {
+        value: 0,
+        classification: 'Unknown'
+      }
     } satisfies NewsletterType));
     
     return NextResponse.json(newsletters);
