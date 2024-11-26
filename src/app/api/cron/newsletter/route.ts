@@ -36,7 +36,7 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
       preview_text: `Bitcoin is trading at $${bitcoinPrice.toLocaleString()}`,
       title: subject,
       from_name: 'Bitcoin Brainiac',
-      reply_to: 'news@bitcoinbrainiac.com',
+      reply_to: 'hello@bitcoinbrainiac.net',
       template_id: process.env.MAILCHIMP_TEMPLATE_ID
     },
     recipients: {
@@ -54,6 +54,11 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
       await mailchimp.campaigns.delete(campaign.id);
       throw new Error('Failed to set campaign content');
     }
+
+    // Schedule the campaign for 6:00 AM PST (2:00 PM UTC)
+    await mailchimp.campaigns.schedule(campaign.id, {
+      schedule_time: '2023-10-10T14:00:00Z' // 6:00 AM PST in UTC
+    });
 
     return campaign;
   } catch (error) {

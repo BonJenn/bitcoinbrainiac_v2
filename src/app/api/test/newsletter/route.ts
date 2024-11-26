@@ -55,6 +55,11 @@ export async function GET(request: Request) {
       }
     });
 
+    // Schedule the campaign if needed
+    await mailchimp.campaigns.schedule(campaign.id, {
+      schedule_time: '2023-10-10T14:00:00Z' // 6:00 AM PST in UTC
+    });
+
     // Set campaign content
     await mailchimp.campaigns.setContent(campaign.id, {
       html: content
