@@ -25,17 +25,9 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
   }));
 
   const fearGreedColor = bitcoinData.fearGreedIndex.classification.toLowerCase().includes('fear') ? 'dc3545' : '28a745';
-  const fearGreedChartUrl = 'https://alternative.me/crypto/fear-and-greed-index.png';
-  
   const fearGreedHtml = `
     <div style="margin: 20px 0;">
-      <img src="${fearGreedChartUrl}" alt="Bitcoin Fear and Greed Index" style="max-width: 100%; height: auto; border-radius: 8px;">
-      <p style="color: #666; font-size: 0.9em; margin-top: 8px;">
-        Current Fear & Greed Index: 
-        <span style="color: #${fearGreedColor}; font-weight: bold">
-          ${bitcoinData.fearGreedIndex.value} (${bitcoinData.fearGreedIndex.classification})
-        </span>
-      </p>
+      <h3 style="margin-bottom: 10px;">Fear & Greed Index: <span style="color: #${fearGreedColor}">${bitcoinData.fearGreedIndex.value} - ${bitcoinData.fearGreedIndex.classification}</span></h3>
     </div>
   `;
 

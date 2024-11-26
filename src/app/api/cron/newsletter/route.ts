@@ -114,7 +114,12 @@ function findMainStory(articles: any[]) {
   return mainStory;
 }
 
-async function storeNewsletter(campaignId: string, content: string, bitcoinPrice: number) {
+async function storeNewsletter(
+  campaignId: string, 
+  content: string, 
+  bitcoinPrice: number,
+  fearGreedData: { value: number; classification: string }
+) {
   try {
     console.log('Storing newsletter with price:', bitcoinPrice);
     
@@ -126,7 +131,11 @@ async function storeNewsletter(campaignId: string, content: string, bitcoinPrice
       sentAt: new Date(),
       bitcoinPrice,
       campaignId,
-      priceChange: 0
+      priceChange: 0,
+      fearGreedIndex: {
+        value: fearGreedData.value,
+        classification: fearGreedData.classification
+      }
     });
     
     const saved = await newsletter.save();
@@ -203,7 +212,7 @@ export async function GET(request: Request) {
       bitcoinPrice: bitcoinData.price
     });
     
-    const newsletter = await storeNewsletter(campaign.id, newsletterContent, bitcoinData.price);
+    const newsletter = await storeNewsletter(campaign.id, newsletterContent, bitcoinData.price, bitcoinData.fearGreedIndex);
     console.log('✅ Newsletter stored:', newsletter);
 
     return NextResponse.json({ 

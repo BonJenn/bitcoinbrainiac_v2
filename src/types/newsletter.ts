@@ -6,5 +6,9 @@ export interface Newsletter {
     sentAt: Date;
     bitcoinPrice: number;
     priceChange: number;
-    subject?: string;
-  }
+    campaignId: string;
+    fearGreedIndex: {
+        value: number;
+        classification: string;
+    };
+}
