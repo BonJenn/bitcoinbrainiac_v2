@@ -24,7 +24,7 @@ declare module '@mailchimp/mailchimp_marketing' {
       create: (data: any) => Promise<Campaign>;
       setContent: (campaignId: string, data: { html: string }) => Promise<any>;
       send: (campaignId: string) => Promise<any>;
-      delete: (campaignId: string) => Promise<any>;
+      remove: (campaignId: string) => Promise<any>;
       schedule: (campaignId: string, data: { schedule_time: string }) => Promise<any>;
     };
     messages: {
