@@ -29,41 +29,50 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
   const formattedPrice = `$${bitcoinPrice.toLocaleString()}`;
   const subject = `${articles[0].title} | BTC Price: ${formattedPrice}`;
 
-  const campaign = await mailchimp.campaigns.create({
-    type: 'regular',
-    settings: {
-      subject_line: subject,
-      preview_text: `Bitcoin is trading at $${bitcoinPrice.toLocaleString()}`,
-      title: subject,
-      from_name: 'Bitcoin Brainiac',
-      reply_to: 'hello@bitcoinbrainiac.net',
-      template_id: process.env.MAILCHIMP_TEMPLATE_ID
-    },
-    recipients: {
-      list_id: process.env.MAILCHIMP_LIST_ID as string
-    }
-  });
-
   try {
+    const campaign = await mailchimp.campaigns.create({
+      type: 'regular',
+      settings: {
+        subject_line: subject,
+        preview_text: `Bitcoin is trading at $${bitcoinPrice.toLocaleString()}`,
+        title: subject,
+        from_name: 'Bitcoin Brainiac',
+        reply_to: 'hello@bitcoinbrainiac.net',
+        template_id: process.env.MAILCHIMP_TEMPLATE_ID
+      },
+      recipients: {
+        list_id: process.env.MAILCHIMP_LIST_ID as string
+      }
+    });
+
+    console.log('Campaign created:', campaign);
+
     const contentResponse = await mailchimp.campaigns.setContent(campaign.id, {
       html: content
     });
 
+    console.log('Content set response:', contentResponse);
+
     if (!contentResponse) {
-      // If content setting fails, delete the campaign to avoid empty drafts
-      await mailchimp.campaigns.delete(campaign.id);
+      await mailchimp.campaigns.remove(campaign.id);
       throw new Error('Failed to set campaign content');
     }
 
-    // Schedule the campaign for 6:00 AM PST (2:00 PM UTC)
+    // Calculate tomorrow at 6am PST
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(6, 0, 0, 0); // 6am PST
+    const scheduleTime = tomorrow.toISOString();
+
+    // Schedule the campaign
     await mailchimp.campaigns.schedule(campaign.id, {
-      schedule_time: '2023-10-10T14:00:00Z' // 6:00 AM PST in UTC
+      schedule_time: scheduleTime
     });
 
-    return campaign
+    console.log('Campaign scheduled for:', scheduleTime);
+    return campaign;
   } catch (error) {
-    // Clean up the campaign if content setting fails
-    await mailchimp.campaigns.delete(campaign.id).catch(console.error);
+    console.error('Error details:', error);
     throw error;
   }
 }
