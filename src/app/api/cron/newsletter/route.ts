@@ -18,7 +18,7 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
   // Configure Mailchimp with correct server format
   mailchimp.setConfig({
     apiKey: process.env.MAILCHIMP_API_KEY,
-    server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0], // Extract server prefix without the '-us10' part
+    server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0],
   });
 
   console.log('Mailchimp Configuration:', {
@@ -58,18 +58,15 @@ export async function createMailchimpCampaign(bitcoinPrice: number, content: str
       throw new Error('Failed to set campaign content');
     }
 
-    // Calculate tomorrow at 6am PST
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(6, 0, 0, 0); // 6am PST
-    const scheduleTime = tomorrow.toISOString();
+    // Send campaign immediately instead of scheduling
+    try {
+      await mailchimp.campaigns.send(campaign.id);
+      console.log('Campaign sent successfully');
+    } catch (sendError: any) {
+      console.error('Send error details:', sendError);
+      throw new Error(`Failed to send campaign: ${sendError.message}`);
+    }
 
-    // Schedule the campaign
-    await mailchimp.campaigns.schedule(campaign.id, {
-      schedule_time: scheduleTime
-    });
-
-    console.log('Campaign scheduled for:', scheduleTime);
     return campaign;
   } catch (error) {
     console.error('Error details:', error);
