@@ -71,7 +71,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
        - Volume analysis
     
     5. Market Sentiment
-       ${fearGreedHtml}
+       [FEAR_GREED_INDEX]
        - Institutional activity
        - Trading volume patterns
        - Derivatives market overview
@@ -100,12 +100,14 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
     - Ensure proper HTML formatting within sections only
   `;
 
+  const prompt = prompt.replace('[FEAR_GREED_INDEX]', fearGreedHtml);
+
   const completion = await openai.chat.completions.create({
     model: "gpt-4-turbo-preview",
     messages: [
       {
         role: "system",
-        content: "You are a seasoned financial analyst specializing in Bitcoin and digital assets. Your writing style is clear, analytical, and professionally measured."
+        content: "You are a seasoned financial analyst specializing in Bitcoin and digital assets. Your writing style is clear, analytical, and professionally measured. Do not modify any HTML blocks marked with [FEAR_GREED_INDEX]."
       },
       {
         role: "user",
@@ -114,5 +116,12 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
     ],
   });
 
-  return completion.choices[0].message.content;
+  let content = completion.choices[0].message.content;
+  
+  // Ensure fear and greed index HTML is present
+  if (!content.includes(fearGreedHtml)) {
+    content = content.replace('5. Market Sentiment', `5. Market Sentiment\n${fearGreedHtml}`);
+  }
+
+  return content;
 }
