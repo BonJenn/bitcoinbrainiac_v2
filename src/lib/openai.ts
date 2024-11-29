@@ -118,6 +118,10 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
 
   let content = completion.choices[0].message.content;
   
+  if (!content) {
+    throw new Error('Failed to generate newsletter content');
+  }
+  
   // Ensure fear and greed index HTML is present
   if (!content.includes(fearGreedHtml)) {
     content = content.replace('5. Market Sentiment', `5. Market Sentiment\n${fearGreedHtml}`);
