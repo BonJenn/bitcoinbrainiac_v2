@@ -100,7 +100,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
     - Ensure proper HTML formatting within sections only
   `;
 
-  const prompt = prompt.replace('[FEAR_GREED_INDEX]', fearGreedHtml);
+  const finalPrompt = prompt.replace('[FEAR_GREED_INDEX]', fearGreedHtml);
 
   const completion = await openai.chat.completions.create({
     model: "gpt-4-turbo-preview",
@@ -111,7 +111,7 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
       },
       {
         role: "user",
-        content: prompt + "\n\nArticles:\n" + JSON.stringify(formattedArticles, null, 2)
+        content: finalPrompt + "\n\nArticles:\n" + JSON.stringify(formattedArticles, null, 2)
       }
     ],
   });
