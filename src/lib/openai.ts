@@ -27,14 +27,14 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
   const fearGreedColor = bitcoinData.fearGreedIndex.classification.toLowerCase().includes('fear') ? 'dc3545' : '28a745';
   const fearGreedHtml = `
     <div style="margin: 20px 0;">
+      <img src="https://alternative.me/crypto/fear-and-greed-index.png" alt="Bitcoin Fear and Greed Index" style="max-width: 100%; height: auto; margin-bottom: 10px;">
       <h3 style="margin-bottom: 10px;">Fear & Greed Index: <span style="color: #${fearGreedColor}">${bitcoinData.fearGreedIndex.value} - ${bitcoinData.fearGreedIndex.classification}</span></h3>
     </div>
   `;
 
   const prompt = `
-    Create a well-structured Bitcoin market update with clear sections in the voice of Scott Galloway.
-    Focus exclusively on Bitcoin - do not include any NFT-related content or any other crypto-assets.
-    Include relevant images from the articles where they fit naturally in the content.
+    Create a Bitcoin-focused market update with clear sections in the voice of Scott Galloway.
+    IMPORTANT: Focus EXCLUSIVELY on Bitcoin - DO NOT include any content about other cryptocurrencies, tokens, or NFTs.
     
     Format Requirements:
     - Wrap the entire content in a div with these styles:
@@ -51,9 +51,13 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
       Negative: <span style="color: #dc3545;">
     
     Required Sections:
+    0. Key Points
+       - 3-4 bullet points summarizing the main topics covered in this newsletter
+       - Must relate directly to content in the following sections
+    
     1. Market Overview
        - Lead with current price: ${formattedPrice}
-       - Include dominant market narrative
+       - Include dominant Bitcoin market narrative
     
     2. Key Developments
        - Major news or events
@@ -81,23 +85,19 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
        - Potential market movers
        - Institutional developments to monitor
     
-    Style:
+    Style Guidelines:
+    - BITCOIN ONLY - Remove any non-Bitcoin content
+    - Email subject must directly relate to content covered in the newsletter
     - Professional and authoritative tone
     - Data-driven analysis with specific numbers
-    - Each section should start directly with the heading text (no HTML prefix)
+    - Each section should start directly with the heading text
     - Clear section transitions
     - 400-450 words total
-    - Balance between narrative paragraphs and bullet points
     
-    Images:
-    - Insert the provided imageHtml where relevant to the content
-    - Place images after their related paragraphs
-    - Maximum 3 images in the newsletter
-    
-    Note: 
-    - Do not include any HTML prefix before the first section
-    - Start directly with "Market Overview" as the first line
-    - Ensure proper HTML formatting within sections only
+    Note:
+    - Ensure the subject line topic is thoroughly covered in the newsletter content
+    - Do not mention any cryptocurrencies other than Bitcoin
+    - Start with "Key Points" section followed by "Market Overview"
   `;
 
   const finalPrompt = prompt.replace('[FEAR_GREED_INDEX]', fearGreedHtml);

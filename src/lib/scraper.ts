@@ -75,23 +75,27 @@ export async function scrapeBitcoinNews() {
   console.log('Starting multi-source RSS feed fetch...');
   
   try {
-    // Fetch from all sources in parallel
     const allArticlesArrays = await Promise.all(
       NEWS_SOURCES.map(source => fetchRSSFeed(source))
     );
 
-    // Combine all articles and sort by timestamp
+    // Combine all articles and filter for Bitcoin-only content
     const allArticles = allArticlesArrays
       .flat()
+      .filter(article => {
+        const content = (article.title + article.summary).toLowerCase();
+        // Exclude articles about other cryptocurrencies
+        const excludeTerms = ['ethereum', 'eth', 'altcoin', 'xrp', 'ripple', 'memecoin', 'dogecoin', 'shiba', 'solana', 'sol'];
+        return !excludeTerms.some(term => content.includes(term)) &&
+               content.includes('bitcoin');
+      })
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     if (allArticles.length === 0) {
-      throw new Error('No articles found from any source');
+      throw new Error('No Bitcoin-specific articles found');
     }
 
-    console.log(`Successfully fetched ${allArticles.length} total articles from ${NEWS_SOURCES.length} sources`);
-    
-    // Return 5 most recent articles
+    console.log(`Successfully fetched ${allArticles.length} Bitcoin-focused articles`);
     return allArticles.slice(0, 5);
   } catch (error: any) {
     console.error('Scraping failed:', error);

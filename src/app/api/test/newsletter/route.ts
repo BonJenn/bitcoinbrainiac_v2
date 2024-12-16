@@ -12,7 +12,6 @@ export async function GET(request: Request) {
   try {
     console.log('Starting newsletter test...');
     
-    // Configure Mailchimp
     mailchimp.setConfig({
       apiKey: process.env.MAILCHIMP_API_KEY,
       server: process.env.MAILCHIMP_SERVER_PREFIX?.split('-')[0],
@@ -36,7 +35,6 @@ export async function GET(request: Request) {
     
     if (!content) throw new Error('Failed to generate newsletter content');
 
-    // Override the campaign settings to use the correct email
     const formattedPrice = `$${bitcoinData.price.toLocaleString()}`;
     const subject = `${articles[0].title} | BTC Price: ${formattedPrice}`;
 
@@ -55,55 +53,45 @@ export async function GET(request: Request) {
       }
     });
 
-    // Schedule the campaign if needed
-    await mailchimp.campaigns.schedule(campaign.id, {
-      schedule_time: '2023-10-10T14:00:00Z' // 6:00 AM PST in UTC
-    });
-
-    // Set campaign content
+    // Set the content
     await mailchimp.campaigns.setContent(campaign.id, {
       html: content
     });
-    
-    console.log('Campaign created:', campaign.id);
-    console.log('Attempting to send campaign...');
-    
-    try {
-      const sendResponse = await fetch(
-        `https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/send`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
-            'Content-Type': 'application/json'
-          }
-        }
-      );
 
-      if (!sendResponse.ok) {
-        const error = await sendResponse.json();
-        throw new Error(`Failed to send campaign: ${error.detail || error.message || 'Unknown error'}`);
+    // Send test email using direct API call
+    const testResponse = await fetch(
+      `https://${process.env.MAILCHIMP_SERVER_PREFIX}.api.mailchimp.com/3.0/campaigns/${campaign.id}/actions/test`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.MAILCHIMP_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          test_emails: ['jonathantbenn@gmail.com'],
+          send_type: 'html'
+        })
       }
+    );
 
-      console.log('Campaign sent successfully');
-    } catch (sendError: any) {
-      console.error('Send error details:', sendError);
-      throw new Error(`Failed to send campaign: ${sendError.message}`);
+    if (!testResponse.ok) {
+      const error = await testResponse.json();
+      throw new Error(`Failed to send test email: ${error.detail || error.message || 'Unknown error'}`);
     }
+
+    console.log('Test email sent successfully');
+    
+    // Clean up by deleting the test campaign
+    await mailchimp.campaigns.remove(campaign.id);
     
     return NextResponse.json({ 
       success: true,
       message: 'Test newsletter sent successfully',
       campaignId: campaign.id
     });
+
   } catch (error: any) {
-    console.error('Newsletter test failed:', error);
-    return NextResponse.json({ 
-      error: 'Failed to send test newsletter',
-      details: error.message,
-      stack: error.stack
-    }, { 
-      status: 500 
-    });
+    console.error('Test newsletter error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
