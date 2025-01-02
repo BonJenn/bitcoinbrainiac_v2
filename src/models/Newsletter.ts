@@ -11,7 +11,8 @@ const newsletterSchema = new mongoose.Schema({
   campaignId: { type: String },
   fearGreedIndex: {
     value: { type: Number, required: true },
-    classification: { type: String, required: true }
+    classification: { type: String, required: true },
+    imageUrl: { type: String, required: true }
   }
 }, {
   timestamps: true

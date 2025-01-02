@@ -9,7 +9,8 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
   change24h: number,
   fearGreedIndex: {
     value: number,
-    classification: string
+    classification: string,
+    imageUrl: string
   }
 }) {
   const priceColor = bitcoinData.change24h >= 0 ? 'green' : 'red';
@@ -26,9 +27,9 @@ export async function generateNewsletter(articles: any[], bitcoinData: {
 
   const fearGreedColor = bitcoinData.fearGreedIndex.classification.toLowerCase().includes('fear') ? 'dc3545' : '28a745';
   const fearGreedHtml = `
-    <div style="margin: 20px 0;">
-      <img src="https://alternative.me/crypto/fear-and-greed-index.png" alt="Bitcoin Fear and Greed Index" style="max-width: 100%; height: auto; margin-bottom: 10px;">
-      <h3 style="margin-bottom: 10px;">Fear & Greed Index: <span style="color: #${fearGreedColor}">${bitcoinData.fearGreedIndex.value} - ${bitcoinData.fearGreedIndex.classification}</span></h3>
+    <div class="fear-greed">
+      <h3>Fear & Greed Index: ${bitcoinData.fearGreedIndex.value} - ${bitcoinData.fearGreedIndex.classification}</h3>
+      <img src="${bitcoinData.fearGreedIndex.imageUrl}" alt="Fear and Greed Index" style="max-width: 100%; height: auto;">
     </div>
   `;
 

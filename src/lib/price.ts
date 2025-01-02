@@ -8,16 +8,20 @@ export async function getBitcoinPrice() {
     const priceData = await priceResponse.json();
     const fearGreedData = await fearGreedResponse.json();
 
+    // Get fear/greed index image URL
+    const fearGreedImageUrl = `https://alternative.me/crypto/fear-and-greed-index.png?timestamp=${Date.now()}`;
+    
     return {
       price: priceData.bitcoin.usd,
       change24h: priceData.bitcoin.usd_24h_change,
       fearGreedIndex: {
         value: fearGreedData.data[0].value,
-        classification: fearGreedData.data[0].value_classification
+        classification: fearGreedData.data[0].value_classification,
+        imageUrl: fearGreedImageUrl
       }
     };
   } catch (error) {
-    console.error('Error fetching Bitcoin data:', error);
-    return null;
+    console.error('Failed to fetch Bitcoin price:', error);
+    throw error;
   }
 }
