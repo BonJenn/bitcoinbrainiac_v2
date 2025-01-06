@@ -15,10 +15,10 @@ export async function GET() {
       server: process.env.MAILCHIMP_SERVER_PREFIX,
     });
 
-    // Test Mailchimp connection
+    // Test Mailchimp connection by listing audiences
     console.log('Checking Mailchimp API connection...');
-    const response = await mailchimp.ping.get();
-    console.log('Mailchimp ping response:', response);
+    const response = await mailchimp.lists.getAllLists();
+    console.log('Mailchimp lists response:', response);
 
     // Create a simple test campaign
     console.log('Creating test campaign...');
@@ -38,35 +38,15 @@ export async function GET() {
       html: '<h1>Test Email</h1><p>If you see this, the Mailchimp integration is working!</p>'
     });
 
-    // Send test email
-    console.log('Sending test email to:', process.env.TEST_EMAIL);
-    await mailchimp.campaigns.sendTestEmail(campaign.id, {
-      test_emails: [process.env.TEST_EMAIL],
-      send_type: 'html'
-    });
-
-    return NextResponse.json({
+    return NextResponse.json({ 
       success: true,
-      message: 'Test email sent successfully',
-      campaignId: campaign.id,
-      mailchimpHealth: response,
-      debug: {
-        server: process.env.MAILCHIMP_SERVER_PREFIX,
-        testEmail: process.env.TEST_EMAIL,
-        hasApiKey: !!process.env.MAILCHIMP_API_KEY
-      }
+      campaign: campaign.id
     });
   } catch (error: any) {
     console.error('Mailchimp test failed:', error);
     return NextResponse.json({ 
       error: error.message,
-      stack: error.stack,
-      details: error.response?.body || error.response || 'No additional details',
-      debug: {
-        server: process.env.MAILCHIMP_SERVER_PREFIX,
-        testEmail: process.env.TEST_EMAIL,
-        hasApiKey: !!process.env.MAILCHIMP_API_KEY
-      }
+      details: error.response?.body || 'No additional details'
     }, { 
       status: 500 
     });
