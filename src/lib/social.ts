@@ -58,7 +58,8 @@ async function retryOpenAI(prompt: string, maxRetries = 3): Promise<string> {
       const completion = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
         messages: [{ role: "user", content: prompt }],
-        timeout: 30000, // 30 second timeout
+        max_tokens: 150,
+        temperature: 0.7
       });
       return completion.choices[0].message.content || '';
     } catch (error) {
