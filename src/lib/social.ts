@@ -266,3 +266,18 @@ export async function postDailyTweets(newsletter: Newsletter, articles: any[]) {
     throw error;
   }
 }
+
+async function generateWithGPT4(prompt: string) {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [{ role: "user", content: prompt }],
+      max_tokens: 150,
+      temperature: 0.7
+    });
+    return completion.choices[0].message.content || '';
+  } catch (error) {
+    console.error('Failed to generate with GPT-4:', error);
+    throw error;
+  }
+}
