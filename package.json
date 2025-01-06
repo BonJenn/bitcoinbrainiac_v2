@@ -20,7 +20,6 @@
     "openai": "^4.72.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "supports-color": "^9.4.0",
     "twitter-api-v2": "^1.19.0",
     "uuid": "^11.0.3",
     "ws": "^8.18.0",

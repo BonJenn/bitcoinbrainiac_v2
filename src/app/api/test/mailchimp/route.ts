@@ -17,7 +17,7 @@ export async function GET() {
 
     // Test Mailchimp connection by listing audiences
     console.log('Checking Mailchimp API connection...');
-    const response = await mailchimp.lists.getAllLists();
+    const response = await mailchimp.lists.list();
     console.log('Mailchimp lists response:', response);
 
     // Create a simple test campaign
