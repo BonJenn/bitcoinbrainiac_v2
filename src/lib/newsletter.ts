@@ -34,17 +34,7 @@ export async function sendNewsletter() {
     
     console.log('Newsletter content generated');
 
-    // Create Mailchimp campaign with articles for headline generation
-    console.log('Setting up Mailchimp...', {
-      server: `${process.env.MAILCHIMP_SERVER_PREFIX}.api`,
-      hasApiKey: !!process.env.MAILCHIMP_API_KEY
-    });
-
-    mailchimp.setConfig({
-      apiKey: process.env.MAILCHIMP_API_KEY,
-      server: `${process.env.MAILCHIMP_SERVER_PREFIX}.api`,
-    });
-
+    // Create Mailchimp campaign
     console.log('Creating Mailchimp campaign...');
     const campaign = await createMailchimpCampaign(bitcoinData.price, content, articles);
 
@@ -63,8 +53,8 @@ export async function sendNewsletter() {
     
     const saved = await newsletter.save();
 
-    // Post to X
-    await postDailyTweets(saved);
+    // Post to X with articles
+    await postDailyTweets(saved, articles);
 
     return { campaignId: campaign.id, newsletterId: saved.id };
   } catch (error) {
