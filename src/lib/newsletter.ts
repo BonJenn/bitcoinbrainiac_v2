@@ -5,6 +5,7 @@ import mailchimp from '@mailchimp/mailchimp_marketing';
 import mongoose from 'mongoose';
 import { fetchArticles, fetchBitcoinData } from '@/lib/data';
 import { createMailchimpCampaign } from '@/app/api/cron/newsletter/route';
+import { postDailyTweets } from '@/lib/social';
 
 export async function sendNewsletter() {
   console.log('📨 Starting sendNewsletter function');
@@ -61,6 +62,10 @@ export async function sendNewsletter() {
     });
     
     const saved = await newsletter.save();
+
+    // Post to X
+    await postDailyTweets(saved);
+
     return { campaignId: campaign.id, newsletterId: saved.id };
   } catch (error) {
     console.error('💥 Failed to send newsletter:', error);

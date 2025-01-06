@@ -53,6 +53,7 @@ async function fetchRSSFeed(source: { url: string, name: string }) {
       return {
         title: item.title[0],
         summary: item.description[0].replace(/<[^>]*>/g, ''),
+        url: item.link[0],
         source: source.name,
         timestamp: new Date(item.pubDate[0]).toISOString(),
         fullText: `${item.title[0]} ${item.description[0].replace(/<[^>]*>/g, '')}`,
