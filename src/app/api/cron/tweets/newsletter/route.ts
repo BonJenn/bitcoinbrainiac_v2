@@ -5,7 +5,15 @@ import { xClient } from '@/lib/x';
 import { getRandomBitcoinMeme } from '@/lib/social';
 import axios from 'axios';
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Check for scheduled run
+  const authHeader = request.headers.get('x-cron-auth');
+  const isScheduledRun = authHeader === process.env.CRON_SECRET;
+
+  if (!isScheduledRun) {
+    return NextResponse.json({ message: 'Not a scheduled run' }, { status: 400 });
+  }
+
   try {
     await connectToDatabase();
     const newsletter = await Newsletter.findOne().sort({ sentAt: -1 });

@@ -3,10 +3,8 @@
 import { useEffect, useState } from 'react';
 import { Newsletter } from '@/types/newsletter';
 import NewsletterView from '@/components/NewsletterView';
-import { use } from 'react';
 
-export default function NewsletterPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+export default function NewsletterPage({ params }: { params: { id: string } }) {
   const [newsletter, setNewsletter] = useState<Newsletter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +12,7 @@ export default function NewsletterPage({ params }: { params: Promise<{ id: strin
   useEffect(() => {
     async function fetchNewsletter() {
       try {
-        const response = await fetch(`/api/newsletters/${resolvedParams.id}`);
+        const response = await fetch(`/api/newsletters/${params.id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch newsletter');
         }
@@ -29,7 +27,7 @@ export default function NewsletterPage({ params }: { params: Promise<{ id: strin
     }
 
     fetchNewsletter();
-  }, [resolvedParams.id]);
+  }, [params.id]);
 
   if (loading) {
     return (
