@@ -8,15 +8,20 @@ import { postDailyTweets } from '@/lib/social';
 
 async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
   try {
+    console.log('🔄 Configuring Mailchimp...');
     mailchimp.setConfig({
       apiKey: process.env.MAILCHIMP_API_KEY,
       server: process.env.MAILCHIMP_SERVER_PREFIX,
     });
 
+    // Get the main story from the first article
+    const mainStory = articles[0]?.title || 'Bitcoin News';
+    
+    console.log('📧 Creating Mailchimp campaign...');
     const campaign = await mailchimp.campaigns.create({
       type: "regular",
       settings: {
-        subject_line: `Bitcoin at $${bitcoinPrice.toLocaleString()} | Daily Newsletter`,
+        subject_line: `${mainStory} | BTC $${bitcoinPrice.toLocaleString()}`,
         preview_text: "Your daily dose of Bitcoin news and analysis",
         title: `Bitcoin Brainiac Daily - ${new Date().toLocaleDateString()}`,
         from_name: "Bitcoin Brainiac",
@@ -24,10 +29,10 @@ async function createMailchimpCampaign(bitcoinPrice: number, content: string, ar
         template_id: parseInt(process.env.MAILCHIMP_TEMPLATE_ID || "0"),
       },
     });
-
+    console.log('✅ Campaign created:', campaign.id);
     return campaign;
   } catch (error) {
-    console.error('Failed to create Mailchimp campaign:', error);
+    console.error('❌ Failed to create Mailchimp campaign:', error);
     throw error;
   }
 }
