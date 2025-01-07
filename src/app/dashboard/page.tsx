@@ -6,6 +6,7 @@ import StatCard from '@/components/StatCard';
 import ErrorCard from '@/components/ErrorCard';
 import StatusIndicator from '@/components/StatusIndicator';
 import { useWebSocket } from '@/hooks/useWebSocket';
+import TestComponent from '@/components/TestComponent';
 
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
@@ -59,6 +60,7 @@ export default function Dashboard() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <TestComponent />
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-black">Newsletter Dashboard</h1>
         <StatusIndicator status={status?.systemHealth} />

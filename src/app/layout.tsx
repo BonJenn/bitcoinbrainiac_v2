@@ -42,24 +42,17 @@ export default function RootLayout({
           strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=G-1R70VG55JT"
         />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-        >
+        <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-
             gtag('config', 'G-1R70VG55JT');
           `}
         </Script>
       </head>
       <body 
-        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
-        style={{
-          background: 'radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%)'
-        }}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen bg-gradient-background`}
       >
         <Header />
         <main className="flex-1">{children}</main>
