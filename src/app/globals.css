@@ -14,8 +14,27 @@
   }
 }
 
+html, 
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available; /* for mobile Safari */
+  margin: 0;
+  padding: 0;
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
-  min-height: 100vh;
+  background-attachment: fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+/* For iOS Safari */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
 }

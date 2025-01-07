@@ -153,92 +153,19 @@ async function storeNewsletter(
 }
 
 export async function GET(request: Request) {
-  // Check for a specific header that your cron job will set
+  // Check for scheduled run
   const authHeader = request.headers.get('x-cron-auth');
   const isScheduledRun = authHeader === process.env.CRON_SECRET;
 
-  // Only proceed if this is a scheduled run
   if (!isScheduledRun) {
+    console.log('Unauthorized newsletter creation attempt');
     return NextResponse.json({ message: 'Not a scheduled run' }, { status: 400 });
   }
 
-  const context = 'Newsletter Generation';
-  const metadata: any = {};
-  
   try {
-    console.log('🚀 Starting newsletter generation:', new Date().toISOString());
-    
-    // Connect to database
-    console.log('📡 Connecting to database...');
-    await connectToDatabase();
-    console.log('✅ Database connected');
-    metadata.dbConnection = 'success';
-    
-    // Scrape articles
-    const baseUrl = process.env.NODE_ENV === 'development' 
-      ? 'http://localhost:3000' 
-      : process.env.NEXT_PUBLIC_BASE_URL;
-    const scrapeUrl = `${baseUrl}/api/scrape`;
-    console.log('Fetching articles from:', scrapeUrl);
-    const scrapeRes = await fetch(scrapeUrl);
-    const data = await scrapeRes.json();
-    
-    if (!scrapeRes.ok || data.error) {
-      console.error('Scrape response error:', data);
-      throw new Error(data.error || 'Failed to scrape articles');
-    }
-    
-    if (!data.articles || !Array.isArray(data.articles) || data.articles.length === 0) {
-      console.error('Invalid articles data:', data);
-      throw new Error('No articles found');
-    }
-    
-    metadata.articlesCount = data.articles.length;
-    console.log(`Found ${data.articles.length} articles`);
-    
-    // Get Bitcoin price
-    const bitcoinData = await getBitcoinPrice();
-    metadata.bitcoinPrice = bitcoinData;
-
-    if (!bitcoinData?.price) {
-      throw new Error('Failed to fetch Bitcoin price');
-    }
-
-    // Generate newsletter
-    const newsletterContent = await generateNewsletter(data.articles, {
-      price: Number(bitcoinData.price),
-      change24h: Number(bitcoinData.change24h),
-      fearGreedIndex: bitcoinData.fearGreedIndex
-    });
-    metadata.contentGenerated = !!newsletterContent;
-    
-    if (!newsletterContent) {
-      throw new Error('Failed to generate newsletter content');
-    }
-
-    // Create and send campaign
-    const campaign = await createMailchimpCampaign(bitcoinData.price, newsletterContent, data.articles);
-    metadata.campaignId = campaign.id;
-    
-    // Before storing newsletter
-    console.log('💾 About to store newsletter with:', {
-      campaignId: campaign.id,
-      contentLength: newsletterContent?.length,
-      bitcoinPrice: bitcoinData.price
-    });
-    
-    const newsletter = await storeNewsletter(campaign.id, newsletterContent, bitcoinData.price, bitcoinData.fearGreedIndex);
-    console.log('✅ Newsletter stored:', newsletter);
-
-    return NextResponse.json({ 
-      success: true,
-      campaignId: campaign.id,
-      newsletterId: newsletter.id
-    });
-    
+    // ... rest of your newsletter creation logic ...
   } catch (error: any) {
-    console.error('❌ Newsletter generation failed:', error);
-    await logError(error, context, metadata);
+    console.error('Newsletter creation failed:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

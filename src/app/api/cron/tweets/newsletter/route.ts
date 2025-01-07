@@ -5,6 +5,24 @@ import { xClient } from '@/lib/x';
 import { getRandomBitcoinMeme } from '@/lib/social';
 import axios from 'axios';
 
+// Add retry logic with exponential backoff
+async function sendTweetWithRetry(client: any, tweetData: any, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await client.tweets.create(tweetData);
+    } catch (error: any) {
+      if (error.code === 429) {
+        // Wait exponentially longer between retries
+        const waitTime = Math.pow(2, i) * 1000;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+        continue;
+      }
+      throw error;
+    }
+  }
+  throw new Error('Max retries exceeded');
+}
+
 export async function GET(request: Request) {
   // Check for scheduled run
   const authHeader = request.headers.get('x-cron-auth');
