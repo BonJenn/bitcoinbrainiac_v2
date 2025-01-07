@@ -4,20 +4,38 @@ import Newsletter from '@/models/Newsletter';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 import mongoose from 'mongoose';
 import { fetchArticles, fetchBitcoinData } from '@/lib/data';
-import { createMailchimpCampaign } from '@/app/api/cron/newsletter/route';
 import { postDailyTweets } from '@/lib/social';
 
-export async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
-  // Your Mailchimp campaign creation logic here
-  // Return the campaign object
+async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
+  try {
+    mailchimp.setConfig({
+      apiKey: process.env.MAILCHIMP_API_KEY,
+      server: process.env.MAILCHIMP_SERVER_PREFIX,
+    });
+
+    const campaign = await mailchimp.campaigns.create({
+      type: "regular",
+      settings: {
+        subject_line: `Bitcoin at $${bitcoinPrice.toLocaleString()} | Daily Newsletter`,
+        preview_text: "Your daily dose of Bitcoin news and analysis",
+        title: `Bitcoin Brainiac Daily - ${new Date().toLocaleDateString()}`,
+        from_name: "Bitcoin Brainiac",
+        reply_to: "hello@bitcoinbrainiac.net",
+        template_id: parseInt(process.env.MAILCHIMP_TEMPLATE_ID || "0"),
+      },
+    });
+
+    return campaign;
+  } catch (error) {
+    console.error('Failed to create Mailchimp campaign:', error);
+    throw error;
+  }
 }
 
 export async function createNewsletter() {
   try {
-    // Connect to the database
     await connectToDatabase();
     
-    // Generate newsletter content
     const articles = await fetchArticles();
     const bitcoinData = await fetchBitcoinData();
 
@@ -31,7 +49,6 @@ export async function createNewsletter() {
       throw new Error('Failed to generate newsletter content');
     }
 
-    // Create Mailchimp campaign
     const campaign = await createMailchimpCampaign(bitcoinData.price, content, articles);
 
     return { campaign, content, bitcoinData, articles };
@@ -39,4 +56,8 @@ export async function createNewsletter() {
     console.error('Failed to create newsletter:', error);
     throw error;
   }
+}
+
+export async function sendNewsletter() {
+  // Your existing sendNewsletter function
 }
