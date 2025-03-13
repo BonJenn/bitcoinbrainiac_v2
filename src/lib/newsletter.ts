@@ -79,5 +79,29 @@ export async function createNewsletter() {
 }
 
 export async function sendNewsletter() {
-  // Your existing sendNewsletter function
+  try {
+    await connectToDatabase();
+    
+    // Find the latest unsent newsletter
+    const newsletter = await Newsletter.findOne({ sent: false }).sort({ createdAt: -1 });
+    
+    if (!newsletter) {
+      throw new Error('No unsent newsletter found');
+    }
+
+    // Send via Mailchimp
+    const campaign = await mailchimp.campaigns.send(newsletter.campaignId);
+    
+    // Update newsletter status
+    await Newsletter.findByIdAndUpdate(newsletter._id, {
+      sent: true,
+      sentAt: new Date(),
+      mailchimpResponse: campaign
+    });
+
+    return campaign;
+  } catch (error) {
+    console.error('Failed to send newsletter:', error);
+    throw error;
+  }
 }
