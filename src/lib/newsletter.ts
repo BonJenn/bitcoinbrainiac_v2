@@ -5,6 +5,8 @@ import mailchimp from '@mailchimp/mailchimp_marketing';
 import mongoose from 'mongoose';
 import { fetchArticles, fetchBitcoinData } from '@/lib/data';
 import { postDailyTweets } from '@/lib/social';
+import { scrapeBitcoinNews } from '@/lib/scraper';
+import cron from 'node-cron';
 
 async function createMailchimpCampaign(bitcoinPrice: number, content: string, articles: any[]) {
   try {
@@ -104,4 +106,42 @@ export async function sendNewsletter() {
     console.error('Failed to send newsletter:', error);
     throw error;
   }
+}
+
+export function initializeCronJobs() {
+  // Create newsletter at 5:00 AM PST
+  cron.schedule('0 5 * * *', async () => {
+    try {
+      await createNewsletter();
+    } catch (error) {
+      console.error('Newsletter creation failed:', error);
+    }
+  }, {
+    timezone: "America/Los_Angeles"
+  });
+
+  // Send newsletter at 5:30 AM PST
+  cron.schedule('30 5 * * *', async () => {
+    try {
+      await sendNewsletter();
+    } catch (error) {
+      console.error('Newsletter sending failed:', error);
+    }
+  }, {
+    timezone: "America/Los_Angeles"
+  });
+
+  // Existing tweet job at 6:05 AM PST
+  cron.schedule('5 6 * * *', async () => {
+    try {
+      await connectToDatabase();
+      const latestNewsletter = await Newsletter.findOne().sort({ sentAt: -1 });
+      const articles = await scrapeBitcoinNews();
+      await postDailyTweets(latestNewsletter, articles);
+    } catch (error) {
+      console.error('Tweet posting failed:', error);
+    }
+  }, {
+    timezone: "America/Los_Angeles"
+  });
 }
