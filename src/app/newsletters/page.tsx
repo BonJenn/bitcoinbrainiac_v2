@@ -44,32 +44,30 @@ export default function NewslettersPage() {
   }, []);
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        background: 'radial-gradient(circle at top, #ffffff 0%, #fff3d6 50%, #ffd6a0 100%)'
-      }}
-    >
-      <main className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-12 text-gray-900">Newsletter Archive</h1>
-        
-        {loading ? (
-          <div className="flex justify-center items-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center text-red-500 py-12">
-            <p className="text-xl font-semibold mb-2">Error Loading Newsletters</p>
-            <p className="text-gray-600">{error}</p>
-          </div>
-        ) : newsletters.length === 0 ? (
-          <div className="text-center text-gray-600 py-12">
-            <p>No newsletters found</p>
-          </div>
-        ) : (
-          <NewsletterFeed newsletters={newsletters} />
-        )}
-      </main>
-    </div>
+    <>
+      <div className="fixed inset-0 bg-gradient-to-br from-[#ffe4bc] to-[#ffc49d] -z-10" />
+      <div className="relative min-h-screen">
+        <main className="container mx-auto px-4 py-12">
+          <h1 className="text-4xl font-bold text-center mb-12 text-[#f97316]">Newsletter Archive</h1>
+          
+          {loading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center text-red-500 py-12">
+              <p className="text-xl font-semibold mb-2">Error Loading Newsletters</p>
+              <p className="text-gray-600">{error}</p>
+            </div>
+          ) : newsletters.length === 0 ? (
+            <div className="text-center text-gray-600 py-12">
+              <p>No newsletters found</p>
+            </div>
+          ) : (
+            <NewsletterFeed newsletters={newsletters} />
+          )}
+        </main>
+      </div>
+    </>
   );
 }

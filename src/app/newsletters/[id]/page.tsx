@@ -46,10 +46,13 @@ export default function NewsletterPage({ params }: { params: { id: string } }) {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-4xl mx-auto">
-        <NewsletterView newsletter={newsletter} />
+    <>
+      <div className="fixed inset-0 bg-gradient-to-br from-[#ffe4bc] to-[#ffc49d] -z-10" />
+      <div className="relative min-h-screen py-12 px-4">
+        <div className="max-w-4xl mx-auto">
+          <NewsletterView newsletter={newsletter} />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
